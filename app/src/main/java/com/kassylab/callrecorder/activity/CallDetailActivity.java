@@ -1,4 +1,4 @@
-package com.kassylab.callrecorder;
+package com.kassylab.callrecorder.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.kassylab.callrecorder.R;
+import com.kassylab.callrecorder.fragment.CallDetailFragment;
 
 /**
  * An activity representing a single Call detail screen. This

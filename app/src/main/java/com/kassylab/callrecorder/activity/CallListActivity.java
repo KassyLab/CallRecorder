@@ -1,4 +1,4 @@
-package com.kassylab.callrecorder;
+package com.kassylab.callrecorder.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,11 +9,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.dummy.DummyContent;
+import com.kassylab.callrecorder.fragment.CallDetailFragment;
 
 import java.util.List;
 
@@ -36,7 +39,7 @@ public class CallListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_call_list);
+        setContentView(R.layout.activity_call_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -51,9 +54,9 @@ public class CallListActivity extends AppCompatActivity {
             }
         });
 
-        //View recyclerView = findViewById(R.id.call_list);
-        //assert recyclerView != null;
-        //setupRecyclerView((RecyclerView) recyclerView);
+        View recyclerView = findViewById(R.id.call_list);
+        assert recyclerView != null;
+        setupRecyclerView((RecyclerView) recyclerView);
 
         if (findViewById(R.id.call_detail_container) != null) {
             // The detail container view will be present only in the
@@ -79,10 +82,9 @@ public class CallListActivity extends AppCompatActivity {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            /*View view = LayoutInflater.from(parent.getContext())
+            View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.call_list_content, parent, false);
-            return new ViewHolder(view);*/
-            return null;
+            return new ViewHolder(view);
         }
 
         @Override
@@ -124,7 +126,7 @@ public class CallListActivity extends AppCompatActivity {
             final TextView mContentView;
             DummyContent.DummyItem mItem;
 
-            public ViewHolder(View view) {
+            ViewHolder(View view) {
                 super(view);
                 mView = view;
                 mIdView = view.findViewById(R.id.id);

@@ -1,4 +1,4 @@
-package com.kassylab.callrecorder;
+package com.kassylab.callrecorder.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.kassylab.callrecorder.R;
+import com.kassylab.callrecorder.activity.CallDetailActivity;
+import com.kassylab.callrecorder.activity.CallListActivity;
 import com.kassylab.callrecorder.dummy.DummyContent;
 
 /**

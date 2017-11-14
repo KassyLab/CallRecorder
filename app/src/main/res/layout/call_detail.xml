@@ -6,4 +6,4 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:textIsSelectable="true"
-    tools:context="com.kassylab.callrecorder.CallDetailFragment" />
+    tools:context="com.kassylab.callrecorder.fragment.CallDetailFragment" />
