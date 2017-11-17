@@ -3,4 +3,13 @@
 
     <string name="title_call_list">Call Recorded</string>
     <string name="title_call_detail">Call Recorded Detail</string>
+
+    <string name="receiver_end_call">End Record call</string>
+    <string name="receiver_start_call">Start record call</string>
+    <string name="record_impossible">Unfortunately, it is not possible to record calls on this device. (Usually because another application/service is using the microphone in the background)</string>
+
+    <string name="notification_ticker">Recording is now starting</string>
+    <string name="notification_title">The phone is now on a call</string>
+    <string name="notification_text">If recording was enabled, recording should have started, if not you can enable recording in the application, the phone will stop the recording when the conversation ends</string>
+
 </resources>

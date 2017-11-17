@@ -1,24 +1,25 @@
 package com.kassylab.callrecorder.activity;
 
-import android.content.Context;
-import android.content.Intent;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
+import com.kassylab.callrecorder.Constants;
 import com.kassylab.callrecorder.R;
-import com.kassylab.callrecorder.dummy.DummyContent;
-import com.kassylab.callrecorder.fragment.CallDetailFragment;
-
-import java.util.List;
+import com.kassylab.callrecorder.adapter.CallsRecyclerViewCursorAdapter;
+import com.kassylab.callrecorder.adapter.RecyclerViewCursorAdapter;
+import com.kassylab.callrecorder.provider.CallRecordContract;
 
 /**
  * An activity representing a list of Call. This activity
@@ -28,7 +29,8 @@ import java.util.List;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class CallListActivity extends AppCompatActivity {
+public class CallListActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -36,16 +38,29 @@ public class CallListActivity extends AppCompatActivity {
      */
     private boolean mTwoPane;
 
+    private RecyclerViewCursorAdapter mAdapter;
+
+    public static int updateExternalStorageState() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return Constants.MEDIA_MOUNTED;
+        } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return Constants.MEDIA_MOUNTED_READ_ONLY;
+        } else {
+            return Constants.NO_MEDIA;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call_list);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,13 +80,39 @@ public class CallListActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
+
+        getLoaderManager().initLoader(0, null, this);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+        mAdapter = new CallsRecyclerViewCursorAdapter();
+        recyclerView.setAdapter(mAdapter);
     }
 
-    class SimpleItemRecyclerViewAdapter
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(
+                this,
+                CallRecordContract.Call.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+        Log.d("TEST", mAdapter.getItemCount() + "");
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
+    }
+
+    /*class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final List<DummyContent.DummyItem> mValues;
@@ -138,5 +179,5 @@ public class CallListActivity extends AppCompatActivity {
                 return super.toString() + " '" + mContentView.getText() + "'";
             }
         }
-    }
+    }*/
 }
