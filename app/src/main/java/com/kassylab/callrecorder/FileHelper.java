@@ -32,12 +32,11 @@ public class FileHelper {
     /**
      * returns absolute file directory
      *
-     * @return the filename
-     * @throws Exception if phoneNumber is null
+     * @return
+     * @throws Exception
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static String getFilename(String phoneNumber) throws Exception {
-        String filepath;
+        String filepath = null;
         String myDate = null;
         File file = null;
         if (phoneNumber == null)
@@ -67,20 +66,19 @@ public class FileHelper {
         return (file.getAbsolutePath() + "/d" + myDate + "p" + phoneNumber + ".3gp");
     }
 
-    private static String getFilePath() {
+    public static String getFilePath() {
         // TODO: Change to user selected directory
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored, unused")
-    static void deleteAllRecords(Activity caller) {
+    public static void deleteAllRecords(Activity caller) {
         String filepath = getFilePath() + "/" + Constants.FILE_DIRECTORY;
         File file = new File(filepath);
 
         String listOfFileNames[] = file.list();
 
-        for (String listOfFileName : listOfFileNames) {
-            File file2 = new File(filepath, listOfFileName);
+        for (int i = 0; i < listOfFileNames.length; i++) {
+            File file2 = new File(filepath, listOfFileNames[i]);
             if (file2.exists()) {
                 file2.delete();
             }
@@ -92,8 +90,8 @@ public class FileHelper {
 
         String listOfFileNames2[] = file.list();
 
-        for (String aListOfFileNames2 : listOfFileNames2) {
-            File file2 = new File(filepath, aListOfFileNames2);
+        for (int i = 0; i < listOfFileNames2.length; i++) {
+            File file2 = new File(filepath, listOfFileNames2[i]);
             if (file2.exists()) {
                 file2.delete();
             }
@@ -105,14 +103,16 @@ public class FileHelper {
      *
      * @return A cursor for for accessing the contact list.
      */
-    private static String getContactName(String phoneNum, Activity caller) {
+    public static String getContactName(String phoneNum, Activity caller) {
         String res = phoneNum;
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         String[] projection = new String[]{
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                 ContactsContract.CommonDataKinds.Phone.NUMBER};
+        String selection = null;
+        String[] selectionArgs = null;
         Cursor names = caller.getContentResolver().query(uri, projection,
-                null, null, null);
+                selection, selectionArgs, null);
 
         int indexName = names
                 .getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
@@ -138,25 +138,27 @@ public class FileHelper {
     /**
      * Fetches list of previous recordings
      *
-     * @param f file
-     * @return list of dir
+     * @param f
+     * @return
      */
-    private static List<Model> listDir2(File f, Activity caller) {
+    public static List<Model> listDir2(File f, Activity caller) {
         File[] files = f.listFiles();
-        List<Model> fileList = new ArrayList<>();
-        for (File file : files) {
-            if (!file.getName().matches(Constants.FILE_NAME_PATTERN)) {
-                Log.d(Constants.TAG, String.format(
-                        "'%s' didn't match the file name pattern",
-                        file.getName()));
-                continue;
-            }
+        List<Model> fileList = new ArrayList<Model>();
+        if (files != null) {
+            for (File file : files) {
+                if (!file.getName().matches(Constants.FILE_NAME_PATTERN)) {
+                    Log.d(Constants.TAG, String.format(
+                            "'%s' didn't match the file name pattern",
+                            file.getName()));
+                    continue;
+                }
 
-            Model mModel = new Model(file.getName());
-            String phoneNum = mModel.getCallName().substring(16,
-                    mModel.getCallName().length() - 4);
-            mModel.setUserNameFromContact(getContactName(phoneNum, caller));
-            fileList.add(mModel);
+                Model mModel = new Model(file.getName());
+                String phoneNum = mModel.getCallName().substring(16,
+                        mModel.getCallName().length() - 4);
+                mModel.setUserNameFromContact(getContactName(phoneNum, caller));
+                fileList.add(mModel);
+            }
         }
 
         Collections.sort(fileList);
@@ -165,8 +167,7 @@ public class FileHelper {
         return fileList;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored, unused")
-    static List<Model> listFiles(Activity caller) {
+    public static List<Model> listFiles(Activity caller) {
         String filepath = FileHelper.getFilePath();
         final File file = new File(filepath, Constants.FILE_DIRECTORY);
 
@@ -190,7 +191,6 @@ public class FileHelper {
         return listDir;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deleteFile(String fileName) {
         if (fileName == null)
             return;

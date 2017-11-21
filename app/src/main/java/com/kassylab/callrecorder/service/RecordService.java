@@ -23,6 +23,7 @@ import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -85,7 +86,8 @@ public class RecordService extends Service {
                     Log.d(Constants.TAG, "RecordService STATE_CALL_START");
                     onCall = true;
 
-                    if (!silentMode && phoneNumber != null && !recording) {
+                    if (!silentMode && phoneNumber != null && onCall
+                            && !recording) {
                         startService();
                         startRecording(intent);
                     }
@@ -192,7 +194,6 @@ public class RecordService extends Service {
         super.onDestroy();
     }
 
-    @SuppressWarnings("unused")
     private void startRecording(Intent intent) {
         Log.d(Constants.TAG, "RecordService startRecording");
         boolean exception = false;
@@ -223,7 +224,7 @@ public class RecordService extends Service {
 
             recorder.prepare();
             // Sometimes prepare takes some time to complete
-            // Thread.sleep(2000);
+            Thread.sleep(2000);
             recorder.start();
             recording = true;
             Log.d(Constants.TAG, "RecordService recorderStarted");
@@ -268,7 +269,7 @@ public class RecordService extends Service {
             PendingIntent pendingIntent = PendingIntent.getActivity(
                     getBaseContext(), 0, intent, 0);
 
-            Notification notification = new Notification.Builder(
+            Notification notification = new NotificationCompat.Builder(
                     getBaseContext())
                     .setContentTitle(
                             this.getString(R.string.notification_title))
@@ -276,7 +277,7 @@ public class RecordService extends Service {
                     .setContentText(this.getString(R.string.notification_text))
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setContentIntent(pendingIntent).setOngoing(true)
-                    .build();
+                    .getNotification();
 
             notification.flags = Notification.FLAG_NO_CLEAR;
 

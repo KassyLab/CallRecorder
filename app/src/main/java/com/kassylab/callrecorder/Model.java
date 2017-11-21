@@ -17,7 +17,7 @@ package com.kassylab.callrecorder;
 
 import android.support.annotation.NonNull;
 
-class Model implements Comparable<Model> {
+public class Model implements Comparable<Model> {
     private String callName;
     private String userNameFromContact;
 
@@ -25,7 +25,7 @@ class Model implements Comparable<Model> {
         this.callName = callName;
     }
 
-    String getUserNameFromContact() {
+    public String getUserNameFromContact() {
         return userNameFromContact;
     }
 
@@ -33,7 +33,7 @@ class Model implements Comparable<Model> {
         this.userNameFromContact = userNameFromContact;
     }
 
-    String getCallName() {
+    public String getCallName() {
         return callName;
     }
 

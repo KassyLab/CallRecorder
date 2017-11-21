@@ -15,7 +15,6 @@
  */
 package com.kassylab.callrecorder.receiver;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,10 +28,11 @@ import com.kassylab.callrecorder.service.RecordService;
 
 public class PhoneStateReceiver extends BroadcastReceiver {
 
-    @SuppressLint("UnsafeProtectedBroadcastReceiver")
+    private String phoneNumber;
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        String phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+        phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
         String extraState = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
         Log.d(Constants.TAG, "MyPhoneReciever phoneNumber " + phoneNumber);
 
