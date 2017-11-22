@@ -43,37 +43,34 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                 boolean silent = settings.getBoolean("silentMode", true);
                 if (extraState != null) {
                     if (extraState.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+                        Intent myIntent = new Intent(context, RecordService.class);
+                        myIntent.putExtra(RecordService.EXTRA_COMMAND_TYPE,
+                                RecordService.EXTRA_COMMAND_TYPE_STATE_CALL_START);
+                        context.startService(myIntent);
+                    } else if (extraState.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                         Intent myIntent = new Intent(context,
                                 RecordService.class);
-                        myIntent.putExtra("commandType",
-                                Constants.STATE_CALL_START);
+                        myIntent.putExtra(RecordService.EXTRA_COMMAND_TYPE,
+                                RecordService.EXTRA_COMMAND_TYPE_STATE_CALL_END);
                         context.startService(myIntent);
-                    } else if (extraState
-                            .equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-                        Intent myIntent = new Intent(context,
-                                RecordService.class);
-                        myIntent.putExtra("commandType",
-                                Constants.STATE_CALL_END);
-                        context.startService(myIntent);
-                    } else if (extraState
-                            .equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+                    } else if (extraState.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                         if (phoneNumber == null)
                             phoneNumber = intent
                                     .getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
                         Intent myIntent = new Intent(context,
                                 RecordService.class);
-                        myIntent.putExtra("commandType",
-                                Constants.STATE_INCOMING_NUMBER);
-                        myIntent.putExtra("phoneNumber", phoneNumber);
-                        myIntent.putExtra("silentMode", silent);
+                        myIntent.putExtra(RecordService.EXTRA_COMMAND_TYPE,
+                                RecordService.EXTRA_COMMAND_TYPE_STATE_INCOMING_NUMBER);
+                        myIntent.putExtra(RecordService.EXTRA_PHONE_NUMBER, phoneNumber);
+                        myIntent.putExtra(RecordService.EXTRA_SILENT_MODE, silent);
                         context.startService(myIntent);
                     }
                 } else if (phoneNumber != null) {
                     Intent myIntent = new Intent(context, RecordService.class);
-                    myIntent.putExtra("commandType",
-                            Constants.STATE_INCOMING_NUMBER);
-                    myIntent.putExtra("phoneNumber", phoneNumber);
-                    myIntent.putExtra("silentMode", silent);
+                    myIntent.putExtra(RecordService.EXTRA_COMMAND_TYPE,
+                            RecordService.EXTRA_COMMAND_TYPE_STATE_INCOMING_NUMBER);
+                    myIntent.putExtra(RecordService.EXTRA_PHONE_NUMBER, phoneNumber);
+                    myIntent.putExtra(RecordService.EXTRA_SILENT_MODE, silent);
                     context.startService(myIntent);
                 }
             } catch (Exception e) {
