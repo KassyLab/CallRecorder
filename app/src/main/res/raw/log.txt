@@ -1,0 +1,25 @@
+D/CALL_RECORDER: MyPhoneReciever phoneNumber null
+
+D/CALL_RECORDER: RecordService onStartCommand
+D/CALL_RECORDER: RecordService STATE_CALL_START
+
+D/CALL_RECORDER: MyPhoneReciever phoneNumber null
+
+D/CALL_RECORDER: RecordService onStartCommand
+D/CALL_RECORDER: RecordService STATE_CALL_START
+
+D/CALL_RECORDER: MyPhoneReciever phoneNumber null
+
+D/CALL_RECORDER: RecordService onStartCommand
+D/CALL_RECORDER: RecordService STATE_CALL_END
+D/CALL_RECORDER: RecordService stopService
+D/CALL_RECORDER: RecordService onDestroy
+D/CALL_RECORDER: RecordService stopService
+
+D/CALL_RECORDER: MyPhoneReciever phoneNumber null
+
+D/CALL_RECORDER: RecordService onStartCommand
+D/CALL_RECORDER: RecordService STATE_CALL_END
+D/CALL_RECORDER: RecordService stopService
+D/CALL_RECORDER: RecordService onDestroy
+D/CALL_RECORDER: RecordService stopService

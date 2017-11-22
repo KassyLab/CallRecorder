@@ -205,7 +205,7 @@ public class RecordService extends Service {
             recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            fileName = getFilesDir().getAbsolutePath() + "+" + getFilename(phoneNumber);
+            fileName = getFilesDir().getAbsolutePath() + "/" + getFilename(phoneNumber);
             Log.d(Constants.TAG, fileName);
             recorder.setOutputFile(fileName);
 

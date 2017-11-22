@@ -34,6 +34,8 @@ import java.io.InputStream;
 import java.util.Comparator;
 import java.util.List;
 
+//import com.kassylab.callrecorder.FileHelper;
+
 public class MainActivity extends Activity {
     private static final int CATEGORY_DETAIL = 1;
     private static final int NO_MEMORY_CARD = 2;
@@ -80,10 +82,10 @@ public class MainActivity extends Activity {
 
         res = getResources();
 
-        listView = (ListView) findViewById(R.id.mylist);
+        listView = findViewById(R.id.mylist);
         // mScrollView = (ScrollView) findViewById(R.id.ScrollView01);
-        mScrollView2 = (ScrollView) findViewById(R.id.ScrollView02);
-        mTextView = (TextView) findViewById(R.id.txtNoRecords);
+        mScrollView2 = findViewById(R.id.ScrollView02);
+        mTextView = findViewById(R.id.txtNoRecords);
 
         SharedPreferences settings = this.getSharedPreferences(
                 Constants.LISTEN_ENABLED, 0);
@@ -359,9 +361,9 @@ public class MainActivity extends Activity {
         switch (id) {
             case CATEGORY_DETAIL:
                 AlertDialog categoryDetail = (AlertDialog) dialog;
-                radEnable = (RadioButton) categoryDetail
+                radEnable = categoryDetail
                         .findViewById(R.id.radio_Enable_record);
-                radDisable = (RadioButton) categoryDetail
+                radDisable = categoryDetail
                         .findViewById(R.id.radio_Disable_record);
                 radEnable.setChecked(true);
                 break;

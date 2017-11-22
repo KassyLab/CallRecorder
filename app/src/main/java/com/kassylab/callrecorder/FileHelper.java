@@ -188,6 +188,15 @@ public class FileHelper {
 
         listDir.addAll(listDir2);
 
+        final File file3 = new File(filepath);
+        if (!file3.exists()) {
+            file3.mkdirs();
+        }
+
+        final List<Model> listDir3 = FileHelper.listDir2(file3, caller);
+
+        listDir.addAll(listDir3);
+
         return listDir;
     }
 

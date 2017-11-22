@@ -17,7 +17,7 @@ package com.kassylab.callrecorder;
 @SuppressWarnings("WeakerAccess")
 public class Constants {
 
-    public static final String TAG = "Call recorder: ";
+    public static final String TAG = "CALL_RECORDER";
 
     public static final String FILE_DIRECTORY = "recordedCalls";
     public static final String LISTEN_ENABLED = "ListenEnabled";
