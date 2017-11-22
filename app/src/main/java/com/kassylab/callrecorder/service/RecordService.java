@@ -24,6 +24,7 @@ import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.activity.CallListActivity;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class RecordService extends Service {
 
@@ -203,7 +205,8 @@ public class RecordService extends Service {
             recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            fileName = FileHelper.getFilename(phoneNumber);
+            fileName = getFilesDir().getAbsolutePath() + "+" + getFilename(phoneNumber);
+            Log.d(Constants.TAG, fileName);
             recorder.setOutputFile(fileName);
 
             OnErrorListener errorListener = new OnErrorListener() {
@@ -257,6 +260,20 @@ public class RecordService extends Service {
                     Toast.LENGTH_LONG);
             toast.show();
         }
+    }
+
+    private String getFilename(String phoneNumber) throws Exception {
+        if (phoneNumber == null) {
+            throw new Exception("Phone number can't be empty");
+        }
+        String date = (String) DateFormat.format("yyyyMMddkkmmss", new Date());
+
+        phoneNumber = phoneNumber.replaceAll("[\\*\\+-]", "");
+        if (phoneNumber.length() > 10) {
+            phoneNumber = phoneNumber.substring(phoneNumber.length() - 10, phoneNumber.length());
+        }
+
+        return "d" + date + "p" + phoneNumber + ".3gp";
     }
 
     private void startService() {
