@@ -23,7 +23,6 @@ import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.Toast;
@@ -78,9 +77,6 @@ public class RecordService extends Service {
         if (intent != null) {
             int commandType = intent.getIntExtra(EXTRA_COMMAND_TYPE, 0);
             if (commandType != 0) {
-                switch (commandType) {
-                }
-
                 if (commandType == EXTRA_COMMAND_TYPE_RECORDING_ENABLED) {
                     Log.d(TAG, "RecordService RECORDING_ENABLED");
                     silentMode = intent.getBooleanExtra("silentMode", true);
@@ -95,39 +91,44 @@ public class RecordService extends Service {
                         commandType = Constants.STATE_STOP_RECORDING;
                 }
 
-                if (commandType == EXTRA_COMMAND_TYPE_STATE_INCOMING_NUMBER) {
-                    Log.d(TAG, "RecordService STATE_INCOMING_NUMBER");
-                    startService();
-                    if (phoneNumber == null)
-                        phoneNumber = intent.getStringExtra(EXTRA_PHONE_NUMBER);
-
-                    silentMode = intent.getBooleanExtra("silentMode", true);
-                } else if (commandType == EXTRA_COMMAND_TYPE_STATE_CALL_START) {
-                    Log.d(TAG, "RecordService STATE_CALL_START");
-                    onCall = true;
-
-                    if (!silentMode && phoneNumber != null && onCall
-                            && !recording) {
+                switch (commandType) {
+                    case EXTRA_COMMAND_TYPE_STATE_INCOMING_NUMBER:
+                        Log.d(TAG, "RecordService STATE_INCOMING_NUMBER");
                         startService();
-                        startRecording(intent);
-                    }
-                } else if (commandType == EXTRA_COMMAND_TYPE_STATE_CALL_END) {
-                    Log.d(TAG, "RecordService STATE_CALL_END");
-                    onCall = false;
-                    phoneNumber = null;
-                    stopAndReleaseRecorder();
-                    recording = false;
-                    stopService();
-                } else if (commandType == EXTRA_COMMAND_TYPE_STATE_START_RECORDING) {
-                    Log.d(TAG, "RecordService STATE_START_RECORDING");
-                    if (!silentMode && phoneNumber != null && onCall) {
-                        startService();
-                        startRecording(intent);
-                    }
-                } else if (commandType == EXTRA_COMMAND_TYPE_STATE_STOP_RECORDING) {
-                    Log.d(TAG, "RecordService STATE_STOP_RECORDING");
-                    stopAndReleaseRecorder();
-                    recording = false;
+                        if (phoneNumber == null)
+                            phoneNumber = intent.getStringExtra(EXTRA_PHONE_NUMBER);
+
+                        silentMode = intent.getBooleanExtra("silentMode", true);
+                        break;
+                    case EXTRA_COMMAND_TYPE_STATE_CALL_START:
+                        Log.d(TAG, "RecordService STATE_CALL_START");
+                        onCall = true;
+
+                        if (!silentMode && phoneNumber != null && onCall && !recording) {
+                            startService();
+                            startRecording(intent);
+                        }
+                        break;
+                    case EXTRA_COMMAND_TYPE_STATE_CALL_END:
+                        Log.d(TAG, "RecordService STATE_CALL_END");
+                        onCall = false;
+                        phoneNumber = null;
+                        stopAndReleaseRecorder();
+                        recording = false;
+                        stopService();
+                        break;
+                    case EXTRA_COMMAND_TYPE_STATE_START_RECORDING:
+                        Log.d(TAG, "RecordService STATE_START_RECORDING");
+                        if (!silentMode && phoneNumber != null && onCall) {
+                            startService();
+                            startRecording(intent);
+                        }
+                        break;
+                    case EXTRA_COMMAND_TYPE_STATE_STOP_RECORDING:
+                        Log.d(TAG, "RecordService STATE_STOP_RECORDING");
+                        stopAndReleaseRecorder();
+                        recording = false;
+                        break;
                 }
             }
         }
@@ -304,7 +305,7 @@ public class RecordService extends Service {
             PendingIntent pendingIntent = PendingIntent.getActivity(
                     getBaseContext(), 0, intent, 0);
 
-            Notification notification = new NotificationCompat.Builder(
+            Notification notification = new Notification.Builder(
                     getBaseContext())
                     .setContentTitle(
                             this.getString(R.string.notification_title))
@@ -312,7 +313,7 @@ public class RecordService extends Service {
                     .setContentText(this.getString(R.string.notification_text))
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setContentIntent(pendingIntent).setOngoing(true)
-                    .getNotification();
+                    .build();
 
             notification.flags = Notification.FLAG_NO_CLEAR;
 
