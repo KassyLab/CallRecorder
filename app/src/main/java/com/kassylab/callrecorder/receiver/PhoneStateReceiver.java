@@ -28,43 +28,43 @@ import com.kassylab.callrecorder.service.RecordService;
 
 public class PhoneStateReceiver extends BroadcastReceiver {
 
-    private String phoneNumber;
-
     @Override
     public void onReceive(Context context, Intent intent) {
-        phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+
+        String phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
         String extraState = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+
         Log.d(Constants.TAG, "MyPhoneReciever phoneNumber " + phoneNumber);
 
         if (CallListActivity.updateExternalStorageState() == Constants.MEDIA_MOUNTED) {
             try {
                 SharedPreferences settings = context.getSharedPreferences(
                         Constants.LISTEN_ENABLED, 0);
+
                 boolean silent = settings.getBoolean("silentMode", true);
+
                 if (extraState != null) {
+                    Intent myIntent = new Intent(context, RecordService.class);
+
                     if (extraState.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
-                        Intent myIntent = new Intent(context, RecordService.class);
                         myIntent.putExtra(RecordService.EXTRA_COMMAND_TYPE,
                                 RecordService.EXTRA_COMMAND_TYPE_STATE_CALL_START);
-                        context.startService(myIntent);
                     } else if (extraState.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-                        Intent myIntent = new Intent(context,
-                                RecordService.class);
                         myIntent.putExtra(RecordService.EXTRA_COMMAND_TYPE,
                                 RecordService.EXTRA_COMMAND_TYPE_STATE_CALL_END);
-                        context.startService(myIntent);
                     } else if (extraState.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
-                        if (phoneNumber == null)
+                        if (phoneNumber == null) {
                             phoneNumber = intent
                                     .getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-                        Intent myIntent = new Intent(context,
-                                RecordService.class);
+                        }
                         myIntent.putExtra(RecordService.EXTRA_COMMAND_TYPE,
                                 RecordService.EXTRA_COMMAND_TYPE_STATE_INCOMING_NUMBER);
                         myIntent.putExtra(RecordService.EXTRA_PHONE_NUMBER, phoneNumber);
                         myIntent.putExtra(RecordService.EXTRA_SILENT_MODE, silent);
-                        context.startService(myIntent);
                     }
+
+                    context.startService(myIntent);
+
                 } else if (phoneNumber != null) {
                     Intent myIntent = new Intent(context, RecordService.class);
                     myIntent.putExtra(RecordService.EXTRA_COMMAND_TYPE,

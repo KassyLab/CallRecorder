@@ -82,13 +82,13 @@ public class RecordService extends Service {
                     silentMode = intent.getBooleanExtra("silentMode", true);
                     if (!silentMode && phoneNumber != null && onCall
                             && !recording)
-                        commandType = Constants.STATE_START_RECORDING;
+                        commandType = EXTRA_COMMAND_TYPE_STATE_START_RECORDING;
 
                 } else if (commandType == EXTRA_COMMAND_TYPE_RECORDING_DISABLED) {
                     Log.d(TAG, "RecordService RECORDING_DISABLED");
                     silentMode = intent.getBooleanExtra(EXTRA_SILENT_MODE, true);
                     if (onCall && phoneNumber != null && recording)
-                        commandType = Constants.STATE_STOP_RECORDING;
+                        commandType = EXTRA_COMMAND_TYPE_STATE_STOP_RECORDING;
                 }
 
                 switch (commandType) {
@@ -104,7 +104,7 @@ public class RecordService extends Service {
                         Log.d(TAG, "RecordService STATE_CALL_START");
                         onCall = true;
 
-                        if (!silentMode && phoneNumber != null && onCall && !recording) {
+                        if (!silentMode && phoneNumber != null && !recording) {
                             startService();
                             startRecording(intent);
                         }
@@ -228,19 +228,15 @@ public class RecordService extends Service {
             Log.d(TAG, fileName);
             recorder.setOutputFile(fileName);
 
-            OnErrorListener errorListener = new OnErrorListener() {
-                public void onError(MediaRecorder arg0, int arg1, int arg2) {
-                    Log.e(TAG, "OnErrorListener " + arg1 + "," + arg2);
-                    terminateAndEraseFile();
-                }
+            OnErrorListener errorListener = (arg0, arg1, arg2) -> {
+                Log.e(TAG, "OnErrorListener " + arg1 + "," + arg2);
+                terminateAndEraseFile();
             };
             recorder.setOnErrorListener(errorListener);
 
-            OnInfoListener infoListener = new OnInfoListener() {
-                public void onInfo(MediaRecorder arg0, int arg1, int arg2) {
-                    Log.e(TAG, "OnInfoListener " + arg1 + "," + arg2);
-                    terminateAndEraseFile();
-                }
+            OnInfoListener infoListener = (arg0, arg1, arg2) -> {
+                Log.e(TAG, "OnInfoListener " + arg1 + "," + arg2);
+                terminateAndEraseFile();
             };
             recorder.setOnInfoListener(infoListener);
 
