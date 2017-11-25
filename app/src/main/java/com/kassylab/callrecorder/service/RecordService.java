@@ -1,18 +1,3 @@
-/*
- *  Copyright 2012 Kobi Krasnoff
- *
- * This file is part of Call recorder For Android.
-    Call recorder For Android is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    Call recorder For Android is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with Call recorder For Android.  If not, see <http://www.gnu.org/licenses/>
- */
 package com.kassylab.callrecorder.service;
 
 import android.app.Notification;
@@ -23,6 +8,7 @@ import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.IBinder;
+import android.telephony.TelephonyManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.Toast;
@@ -46,6 +32,38 @@ public class RecordService extends Service {
     public static final int EXTRA_COMMAND_TYPE_STATE_START_RECORDING = Constants.STATE_START_RECORDING;
     public static final int EXTRA_COMMAND_TYPE_STATE_STOP_RECORDING = Constants.STATE_STOP_RECORDING;
 
+    /**
+     * The lookup key used with the {@link TelephonyManager#ACTION_PHONE_STATE_CHANGED} broadcast
+     * for a String containing the new call state.
+     * <p>
+     * <p class="note">
+     * Retrieve with
+     * {@link android.content.Intent#getIntExtra(String, int)}.
+     *
+     * @see #EXTRA_STATE_IDLE
+     * @see #EXTRA_STATE_RINGING
+     * @see #EXTRA_STATE_OFFHOOK
+     */
+    public static final String EXTRA_STATE = TelephonyManager.EXTRA_STATE;
+
+    /**
+     * Value used with {@link #EXTRA_STATE} corresponding to
+     * {@link TelephonyManager#CALL_STATE_IDLE}.
+     */
+    public static final int EXTRA_STATE_IDLE = TelephonyManager.CALL_STATE_IDLE;
+
+    /**
+     * Value used with {@link #EXTRA_STATE} corresponding to
+     * {@link TelephonyManager#CALL_STATE_RINGING}.
+     */
+    public static final int EXTRA_STATE_RINGING = TelephonyManager.CALL_STATE_RINGING;
+
+    /**
+     * Value used with {@link #EXTRA_STATE} corresponding to
+     * {@link TelephonyManager#CALL_STATE_OFFHOOK}.
+     */
+    public static final int EXTRA_STATE_OFFHOOK = TelephonyManager.CALL_STATE_OFFHOOK;
+
     public static final String EXTRA_PHONE_NUMBER = "phoneNumber";
     public static final String EXTRA_SILENT_MODE = "silentMode";
     public static final String TAG = Constants.TAG;
@@ -57,7 +75,6 @@ public class RecordService extends Service {
     private String fileName;
     private boolean onCall = false;
     private boolean recording = false;
-    private boolean silentMode = false;
     private boolean onForeground = false;
 
     @Override
@@ -72,9 +89,37 @@ public class RecordService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "RecordService onStartCommand");
+        Log.d(TAG, "RecordService.onStartCommand(Intent, int, int)");
 
         if (intent != null) {
+            switch (intent.getIntExtra(EXTRA_STATE, 0)) {
+                case EXTRA_STATE_RINGING:
+                    break;
+                case EXTRA_STATE_OFFHOOK:
+                    Log.d(TAG, "RecordService STATE_CALL_START");
+                    onCall = true;
+
+                    if (phoneNumber == null) {
+                        phoneNumber = intent.getStringExtra(EXTRA_PHONE_NUMBER);
+                    }
+
+                    if (phoneNumber != null && !recording) {
+                        startService();
+                        startRecording(intent);
+                    }
+                    break;
+                case EXTRA_STATE_IDLE:
+                    Log.d(TAG, "RecordService STATE_CALL_END");
+                    onCall = false;
+                    phoneNumber = null;
+                    stopAndReleaseRecorder();
+                    recording = false;
+                    stopService();
+                    break;
+            }
+        }
+
+        /*if (intent != null) {
             int commandType = intent.getIntExtra(EXTRA_COMMAND_TYPE, 0);
             if (commandType != 0) {
                 if (commandType == EXTRA_COMMAND_TYPE_RECORDING_ENABLED) {
@@ -131,7 +176,7 @@ public class RecordService extends Service {
                         break;
                 }
             }
-        }
+        }*/
         return super.onStartCommand(intent, flags, startId);
     }
 
