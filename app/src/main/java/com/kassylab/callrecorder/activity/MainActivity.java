@@ -3,7 +3,6 @@ package com.kassylab.callrecorder.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -24,7 +23,6 @@ import com.kassylab.callrecorder.FileHelper;
 import com.kassylab.callrecorder.Model;
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.adapter.MyCallsAdapter;
-import com.kassylab.callrecorder.service.RecordService;
 
 import java.util.List;
 
@@ -39,7 +37,6 @@ public class MainActivity extends Activity {
     public TextView mTextView;
     public RadioButton radEnable;
     public RadioButton radDisable;
-    private Context context;
 
     /**
      * checks if an external memory card is available
@@ -74,7 +71,6 @@ public class MainActivity extends Activity {
         if (silentMode)
             showDialog(CATEGORY_DETAIL);
 
-        context = this.getBaseContext();
         // showDialog(TERMS);
     }
 
@@ -225,12 +221,12 @@ public class MainActivity extends Activity {
         editor.putBoolean("silentMode", silentMode);
         editor.apply();
 
-        Intent myIntent = new Intent(context, RecordService.class);
+        /*Intent myIntent = new Intent(context, RecordService.class);
         myIntent.putExtra(RecordService.EXTRA_COMMAND_TYPE,
                 silentMode ? Constants.RECORDING_DISABLED
                         : Constants.RECORDING_ENABLED);
         myIntent.putExtra("silentMode", silentMode);
-        context.startService(myIntent);
+        context.startService(myIntent);*/
     }
 
     @Override
