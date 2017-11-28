@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017  KassyLab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.kassylab.callrecorder.activity;
 
 import android.app.LoaderManager;
@@ -5,7 +21,6 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,7 +30,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
-import com.kassylab.callrecorder.Constants;
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.adapter.CallsRecyclerViewCursorAdapter;
 import com.kassylab.callrecorder.adapter.RecyclerViewCursorAdapter;
@@ -40,17 +54,6 @@ public class CallListActivity extends AppCompatActivity
 
     private RecyclerViewCursorAdapter mAdapter;
 
-    public static int updateExternalStorageState() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return Constants.MEDIA_MOUNTED;
-        } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return Constants.MEDIA_MOUNTED_READ_ONLY;
-        } else {
-            return Constants.NO_MEDIA;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,13 +64,8 @@ public class CallListActivity extends AppCompatActivity
         toolbar.setTitle(getTitle());
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action",
+                Snackbar.LENGTH_LONG).setAction("Action", null).show());
 
         View recyclerView = findViewById(R.id.call_list);
         assert recyclerView != null;

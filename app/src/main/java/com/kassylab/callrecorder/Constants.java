@@ -1,4 +1,20 @@
 /*
+ * Copyright (C) 2017  KassyLab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
  * 
  * This file is part of Call recorder For Android.
     Call recorder For Android is free software: you can redistribute it and/or modify
@@ -20,19 +36,6 @@ public class Constants {
     public static final String TAG = "CALL_RECORDER";
 
     public static final String FILE_DIRECTORY = "recordedCalls";
-    public static final String LISTEN_ENABLED = "ListenEnabled";
     public static final String FILE_NAME_PATTERN = "^d[\\d]{14}p[_\\d]*\\.3gp$";
-
-    public static final int MEDIA_MOUNTED = 0;
-    public static final int MEDIA_MOUNTED_READ_ONLY = 1;
-    public static final int NO_MEDIA = 2;
-
-    public static final int STATE_INCOMING_NUMBER = 1;
-    public static final int STATE_CALL_START = 2;
-    public static final int STATE_CALL_END = 3;
-    public static final int STATE_START_RECORDING = 4;
-    public static final int STATE_STOP_RECORDING = 5;
-    public static final int RECORDING_ENABLED = 6;
-    public static final int RECORDING_DISABLED = 7;
 
 }

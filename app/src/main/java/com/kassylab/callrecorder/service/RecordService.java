@@ -19,8 +19,11 @@ package com.kassylab.callrecorder.service;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
@@ -32,7 +35,9 @@ import com.kassylab.callrecorder.Constants;
 import com.kassylab.callrecorder.FileHelper;
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.activity.CallListActivity;
+import com.kassylab.callrecorder.provider.CallRecordContract;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -76,6 +81,8 @@ public class RecordService extends Service {
 
     private boolean prepared;
     private boolean recording = false;
+    private Date dateStartRecording;
+    private Date dateStopRecording;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -119,10 +126,10 @@ public class RecordService extends Service {
                 case EXTRA_STATE_STOP:
                     Log.d(TAG, "RecordService STATE_STOP");
 
-                    phoneNumber = null;
-
                     stopRecording();
                     stopService();
+
+                    phoneNumber = null;
                     break;
             }
         }
@@ -175,13 +182,14 @@ public class RecordService extends Service {
 
     private void prepareRecording() throws IllegalStateException, IOException {
         Log.d(TAG, "RecordService.prepareRecording()");
+
         recorder = new MediaRecorder();
+        fileName = getFilesDir().getAbsolutePath() + File.separatorChar + getFilename(phoneNumber);
+        Log.d(TAG, fileName);
 
         recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        fileName = getFilesDir().getAbsolutePath() + "/" + getFilename(phoneNumber);
-        Log.d(TAG, fileName);
         recorder.setOutputFile(fileName);
 
         recorder.setOnErrorListener((arg0, arg1, arg2) -> {
@@ -199,15 +207,18 @@ public class RecordService extends Service {
     }
 
     private void startRecording() {
+        Log.d(TAG, "RecordService.startRecording()");
+
         try {
             if (recorder == null || !prepared) {
                 prepareRecording();
             }
 
             recorder.start();
+            dateStartRecording = new Date();
             recording = true;
 
-            Toast.makeText(this, getString(R.string.receiver_start_call),
+            Toast.makeText(this, getString(R.string.record_start),
                     Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -220,19 +231,22 @@ public class RecordService extends Service {
     }
 
     private void stopRecording() {
-        Log.d(TAG, "RecordService stopRecording");
+        Log.d(TAG, "RecordService.stopRecording()");
 
         if (recorder == null || !recording) {
             return;
         }
 
         try {
+            dateStopRecording = new Date();
             recorder.stop();
             recorder.reset();
             recorder.release();
 
+            saveRecording();
+
             Toast toast = Toast.makeText(this,
-                    this.getString(R.string.receiver_end_call),
+                    this.getString(R.string.record_stop),
                     Toast.LENGTH_SHORT);
             toast.show();
         } catch (IllegalStateException e) {
@@ -249,15 +263,40 @@ public class RecordService extends Service {
      * in case it is impossible to record
      */
     private void terminateRecording() {
-        Log.d(TAG, "RecordService terminateRecording");
+        Log.d(TAG, "RecordService.terminateRecording()");
 
         stopRecording();
         recording = false;
         deleteFile();
     }
 
+    private void saveRecording() {
+        Log.d(TAG, "RecordService.saveRecording()");
+        ContentValues recordValues = new ContentValues();
+
+        recordValues.put(CallRecordContract.Record.COLUMN_FILE_URI, fileName);
+        recordValues.put(CallRecordContract.Record.COLUMN_DURATION,
+                dateStopRecording.getTime() - dateStartRecording.getTime());
+
+        Uri record = getContentResolver().insert(CallRecordContract.Record.CONTENT_URI, recordValues);
+        Log.d(TAG, "RecordService record created");
+
+        if (record != null) {
+            long recordId = ContentUris.parseId(record);
+            ContentValues callValues = new ContentValues();
+
+            callValues.put(CallRecordContract.Call.COLUMN_NUMBER, phoneNumber);
+            callValues.put(CallRecordContract.Call.COLUMN_TYPE, 1);
+            callValues.put(CallRecordContract.Call.COLUMN_DATE, dateStartRecording.getTime());
+            callValues.put(CallRecordContract.Call.COLUMN_RECORD, recordId);
+
+            getContentResolver().insert(CallRecordContract.Call.CONTENT_URI, callValues);
+            Log.d(TAG, "RecordService call created");
+        }
+    }
+
     private void deleteFile() {
-        Log.d(TAG, "RecordService deleteFile");
+        Log.d(TAG, "RecordService.deleteFile()");
 
         FileHelper.deleteFile(fileName);
 

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017  KassyLab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.kassylab.callrecorder.provider;
 
 import android.content.ContentProvider;
@@ -30,7 +46,7 @@ public class CallRecordProvider extends ContentProvider {
         uriMatcher.addURI(CallRecordContract.AUTHORITY, CallRecordContract.PATH_RECORDS + "/#", RECORD_ID);
     }
 
-    private SQLiteOpenHelper sqLiteOpenHelper;
+    private SQLiteOpenHelper dbHelper;
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
@@ -56,7 +72,7 @@ public class CallRecordProvider extends ContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
-        SQLiteDatabase database = sqLiteOpenHelper.getWritableDatabase();
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
 
         long id;
         switch (uriMatcher.match(uri)) {
@@ -82,14 +98,14 @@ public class CallRecordProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        sqLiteOpenHelper = new CallRecorderDbHelper(getContext());
+        dbHelper = new CallRecorderDbHelper(getContext());
         return true;
     }
 
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        SQLiteDatabase database = sqLiteOpenHelper.getReadableDatabase();
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
 
         Cursor cursor;
 
