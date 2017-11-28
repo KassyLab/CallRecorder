@@ -1,4 +1,4 @@
-package com.kassylab.callrecorder;
+package com.kassylab.callrecorder.activity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -24,6 +24,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.kassylab.callrecorder.CallFragment;
+import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.dummy.DummyContent;
 import com.kassylab.callrecorder.fragment.ContactsFragment;
 
@@ -219,7 +221,7 @@ public class MainActivity extends AppCompatActivity
             switch (position) {
                 case 0:
                 case 1:
-                    return CallFragment.newInstance(1);
+                    return CallFragment.newInstance();
                 case 2:
                     return ContactsFragment.newInstance();
             }
