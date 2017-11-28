@@ -25,9 +25,7 @@ import android.content.Intent;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -184,7 +182,7 @@ public class RecordService extends Service {
         Log.d(TAG, "RecordService.prepareRecording()");
 
         recorder = new MediaRecorder();
-        fileName = getFilesDir().getAbsolutePath() + File.separatorChar + getFilename(phoneNumber);
+        fileName = getFilesDir().getAbsolutePath() + File.separatorChar + FileHelper.getFileName(phoneNumber);
         Log.d(TAG, fileName);
 
         recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
@@ -301,17 +299,5 @@ public class RecordService extends Service {
         FileHelper.deleteFile(fileName);
 
         fileName = null;
-    }
-
-    @NonNull
-    private String getFilename(@NonNull String phoneNumber) {
-        String date = (String) DateFormat.format("yyyyMMddkkmmss", new Date());
-
-        phoneNumber = phoneNumber.replaceAll("[*+-]", "");
-        if (phoneNumber.length() > 10) {
-            phoneNumber = phoneNumber.substring(phoneNumber.length() - 10, phoneNumber.length());
-        }
-
-        return "d" + date + "p" + phoneNumber + ".3gp";
     }
 }
