@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017  KassyLab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.kassylab.callrecorder;
 
 import android.content.Context;
@@ -26,115 +42,115 @@ import java.util.List;
  * item details side-by-side using two vertical panes.
  */
 public class CallListActivity extends AppCompatActivity {
-
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
-    private boolean mTwoPane;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_call_list);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        //View recyclerView = findViewById(R.id.call_list);
-        //assert recyclerView != null;
-        //setupRecyclerView((RecyclerView) recyclerView);
-
-        if (findViewById(R.id.call_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
-        }
-    }
-
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
-    }
-
-    class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-
-        private final List<DummyContent.DummyItem> mValues;
-
-        SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
-            mValues = items;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            /*View view = LayoutInflater.from(parent.getContext())
+	
+	/**
+	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
+	 * device.
+	 */
+	private boolean mTwoPane;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		//setContentView(R.layout.activity_call_list);
+		
+		Toolbar toolbar = findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		toolbar.setTitle(getTitle());
+		
+		FloatingActionButton fab = findViewById(R.id.fab);
+		fab.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+						.setAction("Action", null).show();
+			}
+		});
+		
+		//View recyclerView = findViewById(R.id.call_list);
+		//assert recyclerView != null;
+		//setupRecyclerView((RecyclerView) recyclerView);
+		
+		if (findViewById(R.id.call_detail_container) != null) {
+			// The detail container view will be present only in the
+			// large-screen layouts (res/values-w900dp).
+			// If this view is present, then the
+			// activity should be in two-pane mode.
+			mTwoPane = true;
+		}
+	}
+	
+	private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+		recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+	}
+	
+	class SimpleItemRecyclerViewAdapter
+			extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+		
+		private final List<DummyContent.DummyItem> mValues;
+		
+		SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
+			mValues = items;
+		}
+		
+		@Override
+		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+	        /*View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.call_list_content, parent, false);
             return new ViewHolder(view);*/
-            return null;
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
-
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mTwoPane) {
-                        Bundle arguments = new Bundle();
-                        arguments.putString(CallDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                        CallDetailFragment fragment = new CallDetailFragment();
-                        fragment.setArguments(arguments);
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.call_detail_container, fragment)
-                                .commit();
-                    } else {
-                        Context context = v.getContext();
-                        Intent intent = new Intent(context, CallDetailActivity.class);
-                        intent.putExtra(CallDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-
-                        context.startActivity(intent);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return mValues.size();
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            final View mView;
-            final TextView mIdView;
-            final TextView mContentView;
-            DummyContent.DummyItem mItem;
-
-            public ViewHolder(View view) {
-                super(view);
-                mView = view;
-                mIdView = view.findViewById(R.id.id);
-                mContentView = view.findViewById(R.id.content);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString() + " '" + mContentView.getText() + "'";
-            }
-        }
-    }
+			return null;
+		}
+		
+		@Override
+		public void onBindViewHolder(final ViewHolder holder, int position) {
+			holder.mItem = mValues.get(position);
+			holder.mIdView.setText(mValues.get(position).id);
+			holder.mContentView.setText(mValues.get(position).content);
+			
+			holder.mView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (mTwoPane) {
+						Bundle arguments = new Bundle();
+						arguments.putString(CallDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+						CallDetailFragment fragment = new CallDetailFragment();
+						fragment.setArguments(arguments);
+						getSupportFragmentManager().beginTransaction()
+								.replace(R.id.call_detail_container, fragment)
+								.commit();
+					} else {
+						Context context = v.getContext();
+						Intent intent = new Intent(context, CallDetailActivity.class);
+						intent.putExtra(CallDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+						
+						context.startActivity(intent);
+					}
+				}
+			});
+		}
+		
+		@Override
+		public int getItemCount() {
+			return mValues.size();
+		}
+		
+		class ViewHolder extends RecyclerView.ViewHolder {
+			final View mView;
+			final TextView mIdView;
+			final TextView mContentView;
+			DummyContent.DummyItem mItem;
+			
+			public ViewHolder(View view) {
+				super(view);
+				mView = view;
+				mIdView = view.findViewById(R.id.id);
+				mContentView = view.findViewById(R.id.content);
+			}
+			
+			@Override
+			public String toString() {
+				return super.toString() + " '" + mContentView.getText() + "'";
+			}
+		}
+	}
 }
