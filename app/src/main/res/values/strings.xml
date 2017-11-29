@@ -20,6 +20,12 @@
     <string name="title_call_list">Call Recorded</string>
     <string name="title_call_detail">Call Recorded Detail</string>
 
+    <string name="title_tab_all">Journal</string>
+    <string name="title_tab_outgoing">Appels sortants</string>
+    <string name="title_tab_incoming">Appels entrants</string>
+    <string name="title_tab_favorites">Favoris</string>
+    <string name="title_tab_contacts">Contacts</string>
+
     <string name="record_start">Start record call</string>
     <string name="record_stop">End Record call</string>
     <string name="record_impossible">Unfortunately, it is not possible to record calls on this device. (Usually because another application/service is using the microphone in the background)</string>
@@ -27,5 +33,11 @@
     <string name="notification_ticker">Recording is now starting</string>
     <string name="notification_title">The phone is now on a call</string>
     <string name="notification_text">If recording was enabled, recording should have started, if not you can enable recording in the application, the phone will stop the recording when the conversation ends</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 
 </resources>

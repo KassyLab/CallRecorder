@@ -17,6 +17,7 @@
 package com.kassylab.callrecorder.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,16 +39,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.kassylab.callrecorder.CallFragment;
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.dummy.DummyContent;
+import com.kassylab.callrecorder.fragment.CallListFragment;
 import com.kassylab.callrecorder.fragment.ContactsFragment;
 
 public class MainActivity extends AppCompatActivity
 		implements NavigationView.OnNavigationItemSelectedListener,
-		CallFragment.OnListFragmentInteractionListener,
+		CallListFragment.OnListFragmentInteractionListener,
 		ContactsFragment.OnContactSelectedListener {
 	
 	private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 123;
@@ -86,12 +86,10 @@ public class MainActivity extends AppCompatActivity
 		tabLayout.setupWithViewPager(mViewPager);
 		
 		FloatingActionButton fab = findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-						.setAction("Action", null).show();
-			}
+		fab.setOnClickListener(view -> {
+			Snackbar.make(view, "Replace with your own action",
+					Snackbar.LENGTH_LONG).setAction("Action", null).show();
+			startActivity(new Intent(this, CallListActivity.class));
 		});
 		
 		DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -237,7 +235,7 @@ public class MainActivity extends AppCompatActivity
 			switch (position) {
 				case 0:
 				case 1:
-					return CallFragment.newInstance();
+					return CallListFragment.newInstance();
 				case 2:
 					return ContactsFragment.newInstance();
 			}
