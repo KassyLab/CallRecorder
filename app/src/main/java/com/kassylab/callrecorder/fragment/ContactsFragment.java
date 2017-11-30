@@ -35,6 +35,7 @@ import android.view.ViewGroup;
 
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.adapter.ContactRecyclerViewCursorAdapter;
+import com.kassylab.callrecorder.adapter.RecyclerViewCursorAdapter;
 
 /**
  * A fragment representing a list of Items.
@@ -43,7 +44,8 @@ import com.kassylab.callrecorder.adapter.ContactRecyclerViewCursorAdapter;
  * interface.
  */
 public class ContactsFragment extends Fragment implements
-		LoaderManager.LoaderCallbacks<Cursor> {
+		LoaderManager.LoaderCallbacks<Cursor>,
+		RecyclerViewCursorAdapter.OnItemInteractionListener {
 	
 	private static final String[] PROJECTION = {
 			ContactsContract.Contacts._ID,
@@ -75,7 +77,8 @@ public class ContactsFragment extends Fragment implements
 		if (view instanceof RecyclerView) {
 			RecyclerView recyclerView = (RecyclerView) view;
 			recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-			mAdapter = new ContactRecyclerViewCursorAdapter(mListener);
+			mAdapter = new ContactRecyclerViewCursorAdapter();
+			mAdapter.setOnItemInteractionListener(this);
 			recyclerView.setAdapter(mAdapter);
 		}
 		
@@ -127,6 +130,13 @@ public class ContactsFragment extends Fragment implements
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 		mAdapter.swapCursor(null);
+	}
+	
+	@Override
+	public void onItemSelected(Uri uri, int position) {
+		if (mListener != null) {
+			mListener.onContactSelected(uri, position);
+		}
 	}
 	
 	/**

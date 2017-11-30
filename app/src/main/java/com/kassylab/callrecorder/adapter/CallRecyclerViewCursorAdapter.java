@@ -16,40 +16,37 @@
 
 package com.kassylab.callrecorder.adapter;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.ContactsContract;
-import android.support.v7.widget.RecyclerView;
+import android.provider.CallLog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.kassylab.callrecorder.R;
-import com.kassylab.callrecorder.fragment.ContactsFragment;
 
 /**
- * {@link RecyclerView.Adapter} that can display an Item and makes a call to the
- * specified {@link ContactsFragment.OnContactSelectedListener}.
+ * {@link RecyclerViewCursorAdapter} that can display an Item.
  */
-public class ContactRecyclerViewCursorAdapter
-		extends RecyclerViewCursorAdapter<ContactRecyclerViewCursorAdapter.ViewHolder> {
+
+public class CallRecyclerViewCursorAdapter
+		extends RecyclerViewCursorAdapter<CallRecyclerViewCursorAdapter.ViewHolder> {
 	
 	@Override
 	public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		View view = LayoutInflater.from(parent.getContext())
-				.inflate(R.layout.list_item_contact, parent, false);
+				.inflate(R.layout.call_list_content, parent, false);
 		return new ViewHolder(view);
 	}
 	
 	class ViewHolder extends RecyclerViewCursorAdapter.ViewHolder {
 		
-		//final TextView mIdView;
 		final TextView mContentView;
 		
 		ViewHolder(View view) {
 			super(view);
-			//mIdView = view.findViewById(R.id.id);
 			mContentView = view.findViewById(R.id.content);
 		}
 		
@@ -58,20 +55,9 @@ public class ContactRecyclerViewCursorAdapter
 			return super.toString() + " '" + mContentView.getText() + "'";
 		}
 		
+		@SuppressLint("SetTextI18n")
 		protected void bind(Cursor cursor) {
-			int mIdColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID);
-	        /*if (mIdColumn != -1) {
-                //mIdView.setText(cursor.getLong(mIdColumn) + "");
-            }*/
-			int mLookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY);
-			int mDisplayNameColumn = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY);
-			if (mDisplayNameColumn != -1) {
-				mContentView.setText(cursor.getString(mDisplayNameColumn));
-			}
-			itemUri = ContactsContract.Contacts.getLookupUri(
-					cursor.getLong(mIdColumn),
-					cursor.getString(mLookupKeyColumn)
-			);
+			mContentView.setText("Id : " + cursor.getString(cursor.getColumnIndex(CallLog.Calls._ID)));
 		}
 		
 		@Override

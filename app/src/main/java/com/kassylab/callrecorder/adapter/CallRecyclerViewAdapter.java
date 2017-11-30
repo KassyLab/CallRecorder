@@ -23,22 +23,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.kassylab.callrecorder.R;
-import com.kassylab.callrecorder.fragment.CallListFragment.OnListFragmentInteractionListener;
 import com.kassylab.callrecorder.dummy.DummyContent.DummyItem;
+import com.kassylab.callrecorder.fragment.CallListFragment.OnCallSelectedListener;
 
 import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
+ * specified {@link OnCallSelectedListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class CallRecyclerViewAdapter extends RecyclerView.Adapter<CallRecyclerViewAdapter.ViewHolder> {
 	
 	private final List<DummyItem> mValues;
-	private final OnListFragmentInteractionListener mListener;
+	private final OnCallSelectedListener mListener;
 	
-	public CallRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+	public CallRecyclerViewAdapter(List<DummyItem> items, OnCallSelectedListener listener) {
 		mValues = items;
 		mListener = listener;
 	}
@@ -55,14 +55,6 @@ public class CallRecyclerViewAdapter extends RecyclerView.Adapter<CallRecyclerVi
 		holder.mItem = mValues.get(position);
 		holder.mIdView.setText(mValues.get(position).id);
 		holder.mContentView.setText(mValues.get(position).content);
-		
-		holder.mView.setOnClickListener(v -> {
-			if (null != mListener) {
-				// Notify the active callbacks interface (the activity, if the
-				// fragment is attached to one) that an item has been selected.
-				mListener.onListFragmentInteraction(holder.mItem);
-			}
-		});
 	}
 	
 	@Override
@@ -71,14 +63,12 @@ public class CallRecyclerViewAdapter extends RecyclerView.Adapter<CallRecyclerVi
 	}
 	
 	class ViewHolder extends RecyclerView.ViewHolder {
-		final View mView;
 		final TextView mIdView;
 		final TextView mContentView;
 		DummyItem mItem;
 		
 		ViewHolder(View view) {
 			super(view);
-			mView = view;
 			mIdView = view.findViewById(R.id.id);
 			mContentView = view.findViewById(R.id.content);
 		}

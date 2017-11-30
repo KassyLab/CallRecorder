@@ -39,15 +39,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.kassylab.callrecorder.R;
-import com.kassylab.callrecorder.dummy.DummyContent;
 import com.kassylab.callrecorder.fragment.CallListFragment;
 import com.kassylab.callrecorder.fragment.ContactsFragment;
 
-public class MainActivity extends AppCompatActivity
-		implements NavigationView.OnNavigationItemSelectedListener,
-		CallListFragment.OnListFragmentInteractionListener,
+public class MainActivity extends AppCompatActivity implements
+		NavigationView.OnNavigationItemSelectedListener,
+		CallListFragment.OnCallSelectedListener,
 		ContactsFragment.OnContactSelectedListener {
 	
 	private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 123;
@@ -211,13 +211,13 @@ public class MainActivity extends AppCompatActivity
 	}
 	
 	@Override
-	public void onListFragmentInteraction(DummyContent.DummyItem item) {
-	
+	public void onCallSelected(Uri itemUri, int position) {
+		Toast.makeText(this, "Call selected", Toast.LENGTH_SHORT).show();
 	}
 	
 	@Override
-	public void onContactSelected(Uri itemUri, int adapterPosition) {
-	
+	public void onContactSelected(Uri itemUri, int position) {
+		Toast.makeText(this, "Contact selected", Toast.LENGTH_SHORT).show();
 	}
 	
 	/**

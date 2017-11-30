@@ -20,6 +20,7 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -31,7 +32,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.kassylab.callrecorder.R;
-import com.kassylab.callrecorder.adapter.CallsRecyclerViewCursorAdapter;
+import com.kassylab.callrecorder.adapter.CallRecyclerViewCursorAdapter;
 import com.kassylab.callrecorder.adapter.RecyclerViewCursorAdapter;
 import com.kassylab.callrecorder.provider.CallRecordContract;
 
@@ -43,8 +44,8 @@ import com.kassylab.callrecorder.provider.CallRecordContract;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class CallListActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CallListActivity extends AppCompatActivity implements
+		LoaderManager.LoaderCallbacks<Cursor>, RecyclerViewCursorAdapter.OnItemInteractionListener {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -83,8 +84,8 @@ public class CallListActivity extends AppCompatActivity
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        mAdapter = new CallsRecyclerViewCursorAdapter();
-        recyclerView.setAdapter(mAdapter);
+	    mAdapter = new CallRecyclerViewCursorAdapter();
+	    recyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -109,73 +110,9 @@ public class CallListActivity extends AppCompatActivity
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
     }
-
-    /*class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-
-        private final List<DummyContent.DummyItem> mValues;
-
-        SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
-            mValues = items;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.call_list_content, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
-
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mTwoPane) {
-                        Bundle arguments = new Bundle();
-                        arguments.putString(CallDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                        CallDetailFragment fragment = new CallDetailFragment();
-                        fragment.setArguments(arguments);
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.call_detail_container, fragment)
-                                .commit();
-                    } else {
-                        Context context = v.getContext();
-                        Intent intent = new Intent(context, CallDetailActivity.class);
-                        intent.putExtra(CallDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-
-                        context.startActivity(intent);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return mValues.size();
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            final View mView;
-            final TextView mIdView;
-            final TextView mContentView;
-            DummyContent.DummyItem mItem;
-
-            ViewHolder(View view) {
-                super(view);
-                mView = view;
-                mIdView = view.findViewById(R.id.id);
-                mContentView = view.findViewById(R.id.content);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString() + " '" + mContentView.getText() + "'";
-            }
-        }
-    }*/
+	
+	@Override
+	public void onItemSelected(Uri uri, int position) {
+	
+	}
 }

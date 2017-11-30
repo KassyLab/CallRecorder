@@ -17,16 +17,21 @@
 package com.kassylab.callrecorder.adapter;
 
 import android.database.Cursor;
+import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 /**
  * Simplified CursorAdapter designed for RecyclerView.
  *
  * @author Christophe Beyls
  */
-public abstract class RecyclerViewCursorAdapter<ViewHolder extends RecyclerView.ViewHolder>
+public abstract class RecyclerViewCursorAdapter<ViewHolder extends RecyclerViewCursorAdapter.ViewHolder>
 		extends RecyclerView.Adapter<ViewHolder> {
 	
+	@Nullable
+	private OnItemInteractionListener mListener;
 	private Cursor cursor;
 	private int rowIDColumn = -1;
 	
@@ -43,6 +48,7 @@ public abstract class RecyclerViewCursorAdapter<ViewHolder extends RecyclerView.
 	 * If the given new Cursor is the same instance as the previously set
 	 * Cursor, null is also returned.
 	 */
+	@SuppressWarnings("UnusedReturnValue")
 	public Cursor swapCursor(Cursor newCursor) {
 		if (newCursor == cursor) {
 			return null;
@@ -54,6 +60,7 @@ public abstract class RecyclerViewCursorAdapter<ViewHolder extends RecyclerView.
 		return oldCursor;
 	}
 	
+	@SuppressWarnings("unused")
 	public Cursor getCursor() {
 		return cursor;
 	}
@@ -67,6 +74,7 @@ public abstract class RecyclerViewCursorAdapter<ViewHolder extends RecyclerView.
 	 * @param position the position of the item to get
 	 * @return The cursor initialized to the specified position.
 	 */
+	@SuppressWarnings("unused")
 	public Object getItem(int position) {
 		if (cursor != null) {
 			cursor.moveToPosition(position);
@@ -93,5 +101,39 @@ public abstract class RecyclerViewCursorAdapter<ViewHolder extends RecyclerView.
 		onBindViewHolder(holder, cursor);
 	}
 	
-	public abstract void onBindViewHolder(ViewHolder holder, Cursor cursor);
+	@SuppressWarnings("WeakerAccess")
+	public void onBindViewHolder(ViewHolder holder, Cursor cursor) {
+		holder.bind(cursor);
+	}
+	
+	@Nullable
+	@SuppressWarnings("WeakerAccess")
+	public OnItemInteractionListener getOnItemInteractionListener() {
+		return mListener;
+	}
+	
+	public void setOnItemInteractionListener(@Nullable OnItemInteractionListener mListener) {
+		this.mListener = mListener;
+	}
+	
+	
+	public interface OnItemInteractionListener {
+		void onItemSelected(Uri uri, int position);
+	}
+	
+	public static abstract class ViewHolder extends RecyclerView.ViewHolder {
+		
+		@SuppressWarnings("WeakerAccess")
+		public Uri itemUri;
+		
+		ViewHolder(View view) {
+			super(view);
+			itemView.setOnClickListener(v -> onTouch(itemUri, getAdapterPosition()));
+		}
+		
+		protected abstract void bind(Cursor cursor);
+		
+		protected void onTouch(Uri itemUri, int position) {
+		}
+	}
 }
