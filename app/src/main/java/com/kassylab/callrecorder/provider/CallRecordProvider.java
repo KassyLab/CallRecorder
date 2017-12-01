@@ -27,7 +27,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.kassylab.callrecorder.data.CallRecorderDbHelper;
+import com.kassylab.callrecorder.database.CallRecorderDbHelper;
 
 public class CallRecordProvider extends ContentProvider {
 

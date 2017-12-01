@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements
 	
 	@Override
 	public void onCallSelected(Uri itemUri, int position) {
-		Toast.makeText(this, "Call selected", Toast.LENGTH_SHORT).show();
+		startActivity(CallDetailActivity.newIntent(this, itemUri, position));
 	}
 	
 	@Override

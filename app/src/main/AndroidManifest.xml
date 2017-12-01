@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2017  KassyLab
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +12,7 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
--->
+  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.kassylab.callrecorder"
     android:versionCode="1"
@@ -41,7 +40,6 @@
         android:supportsRtl="true"
         android:taskAffinity=""
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/title_activity_main"
@@ -80,6 +78,20 @@
             android:authorities="com.kassylab.call_record"
             android:enabled="true"
             android:exported="false" />
+
+        <activity
+            android:name=".ItemListActivity"
+            android:label="@string/title_item_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".ItemDetailActivity"
+            android:label="@string/title_item_detail"
+            android:parentActivityName=".ItemListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.kassylab.callrecorder.ItemListActivity" />
+        </activity>
     </application>
 
 </manifest>

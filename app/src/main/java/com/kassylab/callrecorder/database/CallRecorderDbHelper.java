@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kassylab.callrecorder.data;
+package com.kassylab.callrecorder.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

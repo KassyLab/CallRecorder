@@ -45,7 +45,8 @@ import com.kassylab.callrecorder.provider.CallRecordContract;
  * item details side-by-side using two vertical panes.
  */
 public class CallListActivity extends AppCompatActivity implements
-		LoaderManager.LoaderCallbacks<Cursor>, RecyclerViewCursorAdapter.OnItemInteractionListener {
+		LoaderManager.LoaderCallbacks<Cursor>,
+		RecyclerViewCursorAdapter.OnItemInteractionListener {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -113,6 +114,6 @@ public class CallListActivity extends AppCompatActivity implements
 	
 	@Override
 	public void onItemSelected(Uri uri, int position) {
-	
+		startActivity(CallDetailActivity.newIntent(this, uri, position));
 	}
 }

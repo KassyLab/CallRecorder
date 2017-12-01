@@ -17,6 +17,7 @@
 package com.kassylab.callrecorder.adapter;
 
 import android.annotation.SuppressLint;
+import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CallLog;
@@ -26,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.kassylab.callrecorder.R;
+import com.kassylab.callrecorder.provider.CallRecordContract;
 
 /**
  * {@link RecyclerViewCursorAdapter} that can display an Item.
@@ -57,7 +59,9 @@ public class CallRecyclerViewCursorAdapter
 		
 		@SuppressLint("SetTextI18n")
 		protected void bind(Cursor cursor) {
-			mContentView.setText("Id : " + cursor.getString(cursor.getColumnIndex(CallLog.Calls._ID)));
+			long id = cursor.getLong(cursor.getColumnIndex(CallLog.Calls._ID));
+			itemUri = ContentUris.withAppendedId(CallRecordContract.Call.CONTENT_URI, id);
+			mContentView.setText("Id : " + id);
 		}
 		
 		@Override
