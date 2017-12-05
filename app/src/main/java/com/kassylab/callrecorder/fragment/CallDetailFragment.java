@@ -61,8 +61,7 @@ import java.util.TimerTask;
  * in two-pane mode (on tablets) or a {@link CallDetailActivity}
  * on handsets.
  */
-public class CallDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
-		SeekBar.OnSeekBarChangeListener, View.OnClickListener, MediaPlayer.OnCompletionListener {
+public class CallDetailFragment extends Fragment /*implements View.OnClickListener, MediaPlayer.OnCompletionListener*/ {
 	
 	/**
 	 * The fragment argument representing the item URI that this fragment
@@ -74,11 +73,14 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 	private static final int LOADER_CALL = 1;
 	private static final int LOADER_RECORD = 2;
 	
+	//region Item Fields
 	private Uri mItemUri;
 	private Uri mRecordUri;
 	private long mDuration;
 	private boolean mFavorite;
+	//endregion
 	
+	//region UI Fields
 	private Timer mTimer = new Timer();
 	private MediaPlayer mMediaPlayer = new MediaPlayer();
 	private boolean mPrepared = false;
@@ -102,11 +104,12 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		}
 	};
 	private TextView totalDuration;
-	
-	private OnCallDetailInteractionListener mListener;
 	private Menu mOptionMenu;
 	private MenuItem favoriteDisableItem;
 	private MenuItem favoriteEnableItem;
+	//endregion
+	
+	private OnCallDetailInteractionListener mListener;
 	
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -123,6 +126,7 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		return fragment;
 	}
 	
+	//region LifeCycle
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -149,7 +153,12 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		currentDuration = rootView.findViewById(R.id.currentDuration);
 		totalDuration = rootView.findViewById(R.id.totalDuration);
 		
-		mMediaPlayer.setOnCompletionListener(this);
+		mMediaPlayer.setOnCompletionListener(mp -> {
+			imageButton.setImageDrawable(
+					getResources().getDrawable(R.drawable.ic_play_circle_filled_black_135dp));
+			currentDuration.setText(DurationHelper.getDuration(0));
+			mPlaying = false;
+		});
 		
 		return rootView;
 	}
@@ -158,8 +167,26 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		
-		seekBar.setOnSeekBarChangeListener(this);
-		imageButton.setOnClickListener(this);
+		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener());
+		imageButton.setOnClickListener(v -> {
+			if (mPrepared) {
+				if (!mPlaying) {
+					mMediaPlayer.start();
+					imageButton.setImageDrawable(
+							getResources().getDrawable(R.drawable.ic_pause_circle_filled_black_135dp));
+					mPlaying = true;
+					
+					startTimer();
+				} else {
+					mMediaPlayer.pause();
+					imageButton.setImageDrawable(
+							getResources().getDrawable(R.drawable.ic_play_circle_filled_black_135dp));
+					mPlaying = false;
+					
+					stopTimer();
+				}
+			}
+		});
 		currentDuration.setText(DurationHelper.getDuration(0));
 	}
 	
@@ -167,7 +194,8 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		getActivity().getSupportLoaderManager().initLoader(LOADER_CALL, null, this);
+		getActivity().getSupportLoaderManager()
+				.initLoader(LOADER_CALL, null, new LoaderCallbacks());
 	}
 	
 	@Override
@@ -204,152 +232,9 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		super.onDetach();
 		mListener = null;
 	}
+	//endregion
 	
-	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		switch (id) {
-			case LOADER_CALL:
-				return new CursorLoader(
-						getContext(),
-						mItemUri,
-						null,
-						null,
-						null,
-						null
-				);
-			case LOADER_RECORD:
-				return new CursorLoader(
-						getContext(),
-						mRecordUri,
-						null,
-						null,
-						null,
-						null
-				);
-			default:
-				return null;
-		}
-		
-	}
-	
-	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		if (data == null || data.getCount() < 1) {
-			return;
-		}
-		data.moveToFirst();
-		ContentValues values;
-		
-		switch (loader.getId()) {
-			case LOADER_CALL:
-				values = new CallCursorWrapper(data).getContentValues();
-				mRecordUri = ContentUris.withAppendedId(CallRecordContract.Record.CONTENT_URI,
-						values.getAsLong(CallRecordContract.Call.COLUMN_RECORD));
-				getActivity().getSupportLoaderManager()
-						.initLoader(LOADER_RECORD, null, this);
-				
-				if (mListener != null) {
-					mListener.setActionBarTitle(
-							getContactName(values.getAsString(CallRecordContract.Call.COLUMN_NUMBER)),
-							DateFormat.getDateTimeInstance().format(
-									new Date(values.getAsLong(CallRecordContract.Call.COLUMN_DATE))));
-					setFavorite(values.getAsBoolean(CallRecordContract.Call.COLUMN_FAVORITE));
-				}
-				break;
-			case LOADER_RECORD:
-				values = new RecordCursorWrapper(data).getContentValues();
-				mDuration = values.getAsLong(CallRecordContract.Record.COLUMN_DURATION);
-				try {
-					preparePlayer(values.getAsString(CallRecordContract.Record.COLUMN_FILE_URI));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				break;
-		}
-	}
-	
-	private void preparePlayer(String path) throws IOException {
-		mMediaPlayer.reset();
-		mMediaPlayer.setDataSource(path);
-		mMediaPlayer.prepare();
-		
-		imageButton.setEnabled(true);
-		totalDuration.setText(DurationHelper.getDuration(mMediaPlayer.getDuration()));
-		
-		mPrepared = true;
-	}
-	
-	@Override
-	public void onLoaderReset(Loader<Cursor> loader) {
-	
-	}
-	
-	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-		progressBar.setProgress(progress);
-	}
-	
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-		stopTimer();
-	}
-	
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
-		mMediaPlayer.seekTo(seekBar.getProgress() * mMediaPlayer.getDuration() / 100);
-		
-		startTimer();
-	}
-	
-	@Override
-	public void onClick(View v) {
-		if (mPrepared) {
-			if (!mPlaying) {
-				mMediaPlayer.start();
-				imageButton.setImageDrawable(
-						getResources().getDrawable(R.drawable.ic_pause_circle_filled_black_135dp));
-				mPlaying = true;
-				
-				startTimer();
-			} else {
-				mMediaPlayer.pause();
-				imageButton.setImageDrawable(
-						getResources().getDrawable(R.drawable.ic_play_circle_filled_black_135dp));
-				mPlaying = false;
-				
-				stopTimer();
-			}
-		}
-	}
-	
-	private void stopTimer() {
-		if (mTimer != null) {
-			mTimer.cancel();
-			mTimer = null;
-		}
-	}
-	
-	private void startTimer() {
-		if (mTimer == null) {
-			mTimer = new Timer();
-		}
-		
-		mTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				getActivity().runOnUiThread(timerUpdater);
-			}
-		}, mDuration / 100, mDuration / 100);
-	}
-	
-	@Override
-	public void onCompletion(MediaPlayer mp) {
-		imageButton.setImageDrawable(
-				getResources().getDrawable(R.drawable.ic_play_circle_filled_black_135dp));
-		currentDuration.setText(DurationHelper.getDuration(0));
-		mPlaying = false;
-	}
-	
+	//region OptionsMenu
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
@@ -385,6 +270,38 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		}
 		return true;
 	}
+	//endregion
+	
+	private void preparePlayer(String path) throws IOException {
+		mMediaPlayer.reset();
+		mMediaPlayer.setDataSource(path);
+		mMediaPlayer.prepare();
+		
+		imageButton.setEnabled(true);
+		totalDuration.setText(DurationHelper.getDuration(mMediaPlayer.getDuration()));
+		
+		mPrepared = true;
+	}
+	
+	private void stopTimer() {
+		if (mTimer != null) {
+			mTimer.cancel();
+			mTimer = null;
+		}
+	}
+	
+	private void startTimer() {
+		if (mTimer == null) {
+			mTimer = new Timer();
+		}
+		
+		mTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				getActivity().runOnUiThread(timerUpdater);
+			}
+		}, mDuration / 100, mDuration / 100);
+	}
 	
 	public String getContactName(final String phoneNumber) {
 		Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
@@ -417,7 +334,101 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		}
 	}
 	
+	
 	public interface OnCallDetailInteractionListener {
 		void setActionBarTitle(String title, String subtitle);
+	}
+	
+	private class LoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+		
+		@Override
+		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			switch (id) {
+				case LOADER_CALL:
+					return new CursorLoader(
+							getContext(),
+							mItemUri,
+							null,
+							null,
+							null,
+							null
+					);
+				case LOADER_RECORD:
+					return new CursorLoader(
+							getContext(),
+							mRecordUri,
+							null,
+							null,
+							null,
+							null
+					);
+				default:
+					return null;
+			}
+			
+		}
+		
+		@Override
+		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+			if (data == null || data.getCount() < 1) {
+				return;
+			}
+			data.moveToFirst();
+			ContentValues values;
+			
+			switch (loader.getId()) {
+				case LOADER_CALL:
+					values = new CallCursorWrapper(data).getContentValues();
+					mRecordUri = ContentUris.withAppendedId(CallRecordContract.Record.CONTENT_URI,
+							values.getAsLong(CallRecordContract.Call.COLUMN_RECORD));
+					getActivity().getSupportLoaderManager()
+							.initLoader(LOADER_RECORD, null, this);
+					
+					if (mListener != null) {
+						mListener.setActionBarTitle(
+								getContactName(values.getAsString(CallRecordContract.Call.COLUMN_NUMBER)),
+								DateFormat.getDateTimeInstance().format(
+										new Date(values.getAsLong(CallRecordContract.Call.COLUMN_DATE))));
+						setFavorite(values.getAsBoolean(CallRecordContract.Call.COLUMN_FAVORITE));
+					}
+					break;
+				case LOADER_RECORD:
+					values = new RecordCursorWrapper(data).getContentValues();
+					mDuration = values.getAsLong(CallRecordContract.Record.COLUMN_DURATION);
+					try {
+						preparePlayer(values.getAsString(CallRecordContract.Record.COLUMN_FILE_URI));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					break;
+			}
+		}
+		
+		@Override
+		public void onLoaderReset(Loader<Cursor> loader) {
+		
+		}
+		
+	}
+	
+	private class OnSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
+		
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			progressBar.setProgress(progress);
+		}
+		
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+			stopTimer();
+		}
+		
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			mMediaPlayer.seekTo(seekBar.getProgress() * mMediaPlayer.getDuration() / 100);
+			
+			startTimer();
+		}
+		
 	}
 }
