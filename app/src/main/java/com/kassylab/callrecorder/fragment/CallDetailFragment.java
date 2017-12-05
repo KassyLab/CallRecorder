@@ -31,6 +31,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.telephony.PhoneNumberUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +77,7 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 	private Uri mItemUri;
 	private Uri mRecordUri;
 	private long mDuration;
+	private boolean mFavorite;
 	
 	private Timer mTimer = new Timer();
 	private MediaPlayer mMediaPlayer = new MediaPlayer();
@@ -101,6 +104,9 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 	private TextView totalDuration;
 	
 	private OnCallDetailInteractionListener mListener;
+	private Menu mOptionMenu;
+	private MenuItem favoriteDisableItem;
+	private MenuItem favoriteEnableItem;
 	
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -120,6 +126,8 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		setHasOptionsMenu(true);
 		
 		if (savedInstanceState == null) {
 			savedInstanceState = getArguments();
@@ -153,6 +161,11 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		seekBar.setOnSeekBarChangeListener(this);
 		imageButton.setOnClickListener(this);
 		currentDuration.setText(DurationHelper.getDuration(0));
+	}
+	
+	@Override
+	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 		
 		getActivity().getSupportLoaderManager().initLoader(LOADER_CALL, null, this);
 	}
@@ -240,6 +253,7 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 							getContactName(values.getAsString(CallRecordContract.Call.COLUMN_NUMBER)),
 							DateFormat.getDateTimeInstance().format(
 									new Date(values.getAsLong(CallRecordContract.Call.COLUMN_DATE))));
+					setFavorite(values.getAsBoolean(CallRecordContract.Call.COLUMN_FAVORITE));
 				}
 				break;
 			case LOADER_RECORD:
@@ -337,14 +351,33 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 	}
 	
 	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		
+		mOptionMenu = menu;
+		// Inflate the mOptionMenu; this adds items to the action bar if it is present.
+		inflater.inflate(R.menu.call_detail, menu);
+		
+		favoriteDisableItem = mOptionMenu.findItem(R.id.action_favorite_disable);
+		favoriteEnableItem = mOptionMenu.findItem(R.id.action_favorite_enable);
+		
+		updateFavorite();
+	}
+	
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean favorite = false;
 		switch (item.getItemId()) {
 			case R.id.action_favorite_enable:
-				//item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-				return false;
+				favorite = true;
 			case R.id.action_favorite_disable:
-				//item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-				return false;
+				ContentValues values = new ContentValues();
+				values.put(CallRecordContract.Call.COLUMN_FAVORITE, favorite);
+				getContext().getContentResolver()
+						.update(mItemUri, values, null, null);
+				
+				setFavorite(favorite);
+				return true;
 			case R.id.action_delete:
 				break;
 			default:
@@ -370,6 +403,18 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		}
 		
 		return contactName;
+	}
+	
+	private void setFavorite(boolean favorite) {
+		mFavorite = favorite;
+		updateFavorite();
+	}
+	
+	private void updateFavorite() {
+		if (mOptionMenu != null) {
+			favoriteDisableItem.setVisible(mFavorite);
+			favoriteEnableItem.setVisible(!mFavorite);
+		}
 	}
 	
 	public interface OnCallDetailInteractionListener {

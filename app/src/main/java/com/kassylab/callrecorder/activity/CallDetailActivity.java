@@ -38,7 +38,8 @@ import com.kassylab.callrecorder.fragment.CallListFragment;
  * item details are presented side-by-side with a list of items
  * in a {@link CallListFragment}.
  */
-public class CallDetailActivity extends AppCompatActivity implements CallDetailFragment.OnCallDetailInteractionListener {
+public class CallDetailActivity extends AppCompatActivity implements
+		CallDetailFragment.OnCallDetailInteractionListener {
 	
 	public static final String EXTRA_ITEM_URI =
 			CallDetailActivity.class.getCanonicalName() + ".extras.ITEM_URI";
@@ -86,35 +87,18 @@ public class CallDetailActivity extends AppCompatActivity implements CallDetailF
 	}
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		mOptionMenu = menu;
-		// Inflate the mOptionMenu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.call_detail, menu);
-		return true;
-	}
-	
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				/*
-				 + This ID represents the Home or Up button. In the case of this
-				 + activity, the Up button is shown. Use NavUtils to allow users
-				 + to navigate up one level in the application structure. For
-				 + more details, see the Navigation pattern on Android Design:
-				 +
-				 + http://developer.android.com/design/patterns/navigation.html#up-vs-back
-				 */
-				NavUtils.navigateUpTo(this, new Intent(this, MainActivity.class));
-				return true;
-			case R.id.action_favorite_enable:
-				item.setVisible(false);
-				mOptionMenu.findItem(R.id.action_favorite_disable).setVisible(true);
-				break;
-			case R.id.action_favorite_disable:
-				item.setVisible(false);
-				mOptionMenu.findItem(R.id.action_favorite_enable).setVisible(true);
-				break;
+		if (item.getItemId() == android.R.id.home) {
+			/*
+			 * This ID represents the Home or Up button. In the case of this
+			 * activity, the Up button is shown. Use NavUtils to allow users
+			 * to navigate up one level in the application structure. For
+			 * more details, see the Navigation pattern on Android Design:
+			 *
+			 * http://developer.android.com/design/patterns/navigation.html#up-vs-back
+			 */
+			NavUtils.navigateUpTo(this, new Intent(this, MainActivity.class));
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
