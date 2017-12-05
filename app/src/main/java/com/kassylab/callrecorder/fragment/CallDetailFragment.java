@@ -18,16 +18,19 @@ package com.kassylab.callrecorder.fragment;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -35,27 +38,28 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.kassylab.callrecorder.DurationHelper;
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.activity.CallDetailActivity;
-import com.kassylab.callrecorder.activity.CallListActivity;
+import com.kassylab.callrecorder.activity.MainActivity;
 import com.kassylab.callrecorder.database.CallCursorWrapper;
 import com.kassylab.callrecorder.database.RecordCursorWrapper;
 import com.kassylab.callrecorder.provider.CallRecordContract;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 /**
  * A fragment representing a single Call detail screen.
- * This fragment is either contained in a {@link CallListActivity}
+ * This fragment is either contained in a {@link MainActivity}
  * in two-pane mode (on tablets) or a {@link CallDetailActivity}
  * on handsets.
  */
 public class CallDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
 		SeekBar.OnSeekBarChangeListener, View.OnClickListener, MediaPlayer.OnCompletionListener {
-	
-	//TODO: release media player on destroy
 	
 	/**
 	 * The fragment argument representing the item URI that this fragment
@@ -90,10 +94,12 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 				seekBar.setProgress(0);
 			}
 			
-			currentDuration.setText(getDuration(progress * mDuration / 100));
+			currentDuration.setText(DurationHelper.getDuration(progress * mDuration / 100));
 		}
 	};
 	private TextView totalDuration;
+	
+	private OnCallDetailInteractionListener mListener;
 	
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -151,9 +157,44 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		
 		seekBar.setOnSeekBarChangeListener(this);
 		imageButton.setOnClickListener(this);
-		currentDuration.setText(getDuration(0));
+		currentDuration.setText(DurationHelper.getDuration(0));
 		
 		getActivity().getSupportLoaderManager().initLoader(LOADER_CALL, null, this);
+	}
+	
+	@Override
+	public void onDestroyView() {
+		if (mMediaPlayer != null) {
+			mMediaPlayer.release();
+			mMediaPlayer = null;
+		}
+		super.onDestroyView();
+	}
+	
+	@Override
+	public void onDestroy() {
+		if (mMediaPlayer != null) {
+			mMediaPlayer.release();
+			mMediaPlayer = null;
+		}
+		super.onDestroy();
+	}
+	
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		try {
+			mListener = (OnCallDetailInteractionListener) context;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(context.toString()
+					+ " must implement OnCallDetailInteractionListener");
+		}
+	}
+	
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mListener = null;
 	}
 	
 	@Override
@@ -198,6 +239,13 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 						values.getAsLong(CallRecordContract.Call.COLUMN_RECORD));
 				getActivity().getSupportLoaderManager()
 						.initLoader(LOADER_RECORD, null, this);
+				
+				if (mListener != null) {
+					mListener.setActionBarTitle(
+							getContactName(values.getAsString(CallRecordContract.Call.COLUMN_NUMBER)),
+							DateFormat.getDateTimeInstance().format(
+									new Date(values.getAsLong(CallRecordContract.Call.COLUMN_DATE))));
+				}
 				break;
 			case LOADER_RECORD:
 				values = new RecordCursorWrapper(data).getContentValues();
@@ -217,7 +265,7 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		mMediaPlayer.prepare();
 		
 		imageButton.setEnabled(true);
-		totalDuration.setText(getDuration(mMediaPlayer.getDuration()));
+		totalDuration.setText(DurationHelper.getDuration(mMediaPlayer.getDuration()));
 		
 		mPrepared = true;
 	}
@@ -289,33 +337,47 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 	public void onCompletion(MediaPlayer mp) {
 		imageButton.setImageDrawable(
 				getResources().getDrawable(R.drawable.ic_play_circle_filled_black_135dp));
-		currentDuration.setText(getDuration(0));
+		currentDuration.setText(DurationHelper.getDuration(0));
 		mPlaying = false;
 	}
 	
-	private String getDuration(long milliseconds) {
-		String finalTimerString = "";
-		String secondsString;
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_favorite_enable:
+				//item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				return false;
+			case R.id.action_favorite_disable:
+				//item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				return false;
+			case R.id.action_delete:
+				break;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+		return true;
+	}
+	
+	public String getContactName(final String phoneNumber) {
+		Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
 		
-		// Convert total duration into time
-		int hours = (int) (milliseconds / (1000 * 60 * 60));
-		int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
-		int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
-		// Add hours if there
-		if (hours > 0) {
-			finalTimerString = hours + ":";
+		String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
+		
+		String contactName = phoneNumber;
+		Cursor cursor = getContext().getContentResolver()
+				.query(uri, projection, null, null, null);
+		
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				contactName = cursor.getString(0);
+			}
+			cursor.close();
 		}
 		
-		// Prepending 0 to seconds if it is one digit
-		if (seconds < 10) {
-			secondsString = "0" + seconds;
-		} else {
-			secondsString = "" + seconds;
-		}
-		
-		finalTimerString = finalTimerString + minutes + ":" + secondsString;
-		
-		// return timer string
-		return finalTimerString;
+		return contactName;
+	}
+	
+	public interface OnCallDetailInteractionListener {
+		void setActionBarTitle(String title, String subtitle);
 	}
 }

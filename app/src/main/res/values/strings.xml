@@ -42,5 +42,8 @@
     <string name="title_item_list">Items</string>
     <string name="title_item_detail">Item Detail</string>
     <string name="content_description_play_pause_button">Play / Pause button</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="action_delete">Delete</string>
+    <string name="contentèdescription_call_type">Call type</string>
 
 </resources>

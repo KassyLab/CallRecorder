@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.IBinder;
+import android.provider.CallLog;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -32,7 +33,7 @@ import android.widget.Toast;
 import com.kassylab.callrecorder.Constants;
 import com.kassylab.callrecorder.FileHelper;
 import com.kassylab.callrecorder.R;
-import com.kassylab.callrecorder.activity.CallListActivity;
+import com.kassylab.callrecorder.activity.MainActivity;
 import com.kassylab.callrecorder.provider.CallRecordContract;
 
 import java.io.File;
@@ -40,7 +41,7 @@ import java.io.IOException;
 import java.util.Date;
 
 public class RecordService extends Service {
-
+    
     /**
      * The lookup key used with the {@link TelephonyManager#ACTION_PHONE_STATE_CHANGED} broadcast
      * for a String containing the new call state.
@@ -81,6 +82,7 @@ public class RecordService extends Service {
     private boolean recording = false;
     private Date dateStartRecording;
     private Date dateStopRecording;
+    private int type = -1;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -102,6 +104,7 @@ public class RecordService extends Service {
                     Log.d(TAG, "RecordService STATE_PREPARE");
 
                     phoneNumber = intent.getStringExtra(EXTRA_PHONE_NUMBER);
+                    type = CallLog.Calls.INCOMING_TYPE;
 
                     try {
                         prepareRecording();
@@ -114,6 +117,9 @@ public class RecordService extends Service {
 
                     if (phoneNumber == null) {
                         phoneNumber = intent.getStringExtra(EXTRA_PHONE_NUMBER);
+                    }
+                    if (type == -1) {
+                        type = CallLog.Calls.OUTGOING_TYPE;
                     }
 
                     if (phoneNumber != null && !recording) {
@@ -128,6 +134,7 @@ public class RecordService extends Service {
                     stopService();
 
                     phoneNumber = null;
+                    type = -1;
                     break;
             }
         }
@@ -148,7 +155,7 @@ public class RecordService extends Service {
     private void startService() {
         if (!onForeground) {
             Log.d(TAG, "RecordService startService");
-            Intent intent = new Intent(this, CallListActivity.class);
+            Intent intent = new Intent(this, MainActivity.class);
             // intent.setAction(Intent.ACTION_VIEW);
             // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -284,7 +291,7 @@ public class RecordService extends Service {
             ContentValues callValues = new ContentValues();
 
             callValues.put(CallRecordContract.Call.COLUMN_NUMBER, phoneNumber);
-            callValues.put(CallRecordContract.Call.COLUMN_TYPE, 1);
+            callValues.put(CallRecordContract.Call.COLUMN_TYPE, type);
             callValues.put(CallRecordContract.Call.COLUMN_DATE, dateStartRecording.getTime());
             callValues.put(CallRecordContract.Call.COLUMN_RECORD, recordId);
 

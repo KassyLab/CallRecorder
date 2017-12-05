@@ -42,7 +42,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
-            android:label="@string/title_activity_main"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,17 +51,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.CallListActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".activity.CallDetailActivity"
             android:label="@string/title_call_detail"
-            android:parentActivityName=".activity.CallListActivity"
+            android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kassylab.callrecorder.activity.CallListActivity" />
+                android:value="com.kassylab.callrecorder.activity.MainActivity" />
         </activity>
 
         <receiver android:name=".receiver.PhoneStateReceiver">
@@ -82,7 +78,7 @@
         <activity
             android:name=".ItemListActivity"
             android:label="@string/title_item_list"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ItemDetailActivity"
             android:label="@string/title_item_detail"

@@ -18,16 +18,24 @@ package com.kassylab.callrecorder.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.CallLog;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.kassylab.callrecorder.DurationHelper;
 import com.kassylab.callrecorder.R;
+import com.kassylab.callrecorder.database.CallCursorWrapper;
+import com.kassylab.callrecorder.database.RecordCursorWrapper;
 import com.kassylab.callrecorder.provider.CallRecordContract;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * {@link RecyclerViewCursorAdapter} that can display an Item.
@@ -39,29 +47,60 @@ public class CallRecyclerViewCursorAdapter
 	@Override
 	public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		View view = LayoutInflater.from(parent.getContext())
-				.inflate(R.layout.call_list_content, parent, false);
+				.inflate(R.layout.list_item_call, parent, false);
 		return new ViewHolder(view);
 	}
 	
 	class ViewHolder extends RecyclerViewCursorAdapter.ViewHolder {
 		
-		final TextView mContentView;
+		final TextView label;
+		final TextView date;
+		final TextView duration;
+		//final ImageView type;
 		
 		ViewHolder(View view) {
 			super(view);
-			mContentView = view.findViewById(R.id.content);
-		}
-		
-		@Override
-		public String toString() {
-			return super.toString() + " '" + mContentView.getText() + "'";
+			label = view.findViewById(R.id.label);
+			date = view.findViewById(R.id.date);
+			duration = view.findViewById(R.id.duration);
+			//type = view.findViewById(R.id.type);
 		}
 		
 		@SuppressLint("SetTextI18n")
 		protected void bind(Cursor cursor) {
-			long id = cursor.getLong(cursor.getColumnIndex(CallLog.Calls._ID));
+			ContentValues values = new CallCursorWrapper(cursor).getContentValues();
+			
+			long id = values.getAsLong(CallRecordContract.Call._ID);
 			itemUri = ContentUris.withAppendedId(CallRecordContract.Call.CONTENT_URI, id);
-			mContentView.setText("Id : " + id);
+			
+			label.setText(getContactName(values.getAsString(CallRecordContract.Call.COLUMN_NUMBER),
+					itemView.getContext()));
+			
+			date.setText(DateFormat.getDateTimeInstance().format(
+					new Date(values.getAsLong(CallRecordContract.Call.COLUMN_DATE))));
+			
+			date.setCompoundDrawablesWithIntrinsicBounds(
+					(values.getAsInteger(CallRecordContract.Call.COLUMN_TYPE) == 1)
+							? R.drawable.ic_call_received : R.drawable.ic_call_made,
+					0, 0, 0);
+			
+			Cursor record = itemView.getContext().getContentResolver().query(
+					ContentUris.withAppendedId(CallRecordContract.Record.CONTENT_URI,
+							values.getAsLong(CallRecordContract.Call.COLUMN_RECORD)),
+					null,
+					null,
+					null,
+					null);
+			if (record != null) {
+				if (record.moveToFirst()) {
+					ContentValues recordValues = new RecordCursorWrapper(record).getContentValues();
+					duration.setText(DurationHelper.getDuration(
+							recordValues.getAsLong(CallRecordContract.Record.COLUMN_DURATION)));
+				}
+				record.close();
+			} else {
+				duration.setText("");
+			}
 		}
 		
 		@Override
@@ -70,6 +109,25 @@ public class CallRecyclerViewCursorAdapter
 			if (listener != null) {
 				listener.onItemSelected(itemUri, position);
 			}
+		}
+		
+		String getContactName(final String phoneNumber, Context context) {
+			Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+			
+			String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
+			
+			String contactName = phoneNumber;
+			Cursor cursor = context.getContentResolver()
+					.query(uri, projection, null, null, null);
+			
+			if (cursor != null) {
+				if (cursor.moveToFirst()) {
+					contactName = cursor.getString(0);
+				}
+				cursor.close();
+			}
+			
+			return contactName;
 		}
 	}
 }

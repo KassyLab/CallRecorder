@@ -20,29 +20,31 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.SubtitleCollapsingToolbarLayout;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.fragment.CallDetailFragment;
+import com.kassylab.callrecorder.fragment.CallListFragment;
 
 /**
  * An activity representing a single Call detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a {@link CallListActivity}.
+ * in a {@link CallListFragment}.
  */
-public class CallDetailActivity extends AppCompatActivity {
+public class CallDetailActivity extends AppCompatActivity implements CallDetailFragment.OnCallDetailInteractionListener {
 	
 	public static final String EXTRA_ITEM_URI =
 			CallDetailActivity.class.getCanonicalName() + ".extras.ITEM_URI";
 	public static final String EXTRA_ITEM_POSITION =
 			CallDetailActivity.class.getCanonicalName() + ".extras.ITEM_POSITION";
+	private Menu mOptionMenu;
 	
 	public static Intent newIntent(Context context, Uri itemUri, int position) {
 		Intent intent = new Intent(context, CallDetailActivity.class);
@@ -57,10 +59,6 @@ public class CallDetailActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_call_detail);
 		Toolbar toolbar = findViewById(R.id.detail_toolbar);
 		setSupportActionBar(toolbar);
-		
-		FloatingActionButton fab = findViewById(R.id.fab);
-		fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-				.setAction("Action", null).show());
 		
 		// Show the Up button in the action bar.
 		ActionBar actionBar = getSupportActionBar();
@@ -88,19 +86,43 @@ public class CallDetailActivity extends AppCompatActivity {
 	}
 	
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		mOptionMenu = menu;
+		// Inflate the mOptionMenu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.call_detail, menu);
+		return true;
+	}
+	
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == android.R.id.home) {
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
-			NavUtils.navigateUpTo(this, new Intent(this, CallListActivity.class));
-			return true;
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				/*
+				 + This ID represents the Home or Up button. In the case of this
+				 + activity, the Up button is shown. Use NavUtils to allow users
+				 + to navigate up one level in the application structure. For
+				 + more details, see the Navigation pattern on Android Design:
+				 +
+				 + http://developer.android.com/design/patterns/navigation.html#up-vs-back
+				 */
+				NavUtils.navigateUpTo(this, new Intent(this, MainActivity.class));
+				return true;
+			case R.id.action_favorite_enable:
+				item.setVisible(false);
+				mOptionMenu.findItem(R.id.action_favorite_disable).setVisible(true);
+				break;
+			case R.id.action_favorite_disable:
+				item.setVisible(false);
+				mOptionMenu.findItem(R.id.action_favorite_enable).setVisible(true);
+				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	public void setActionBarTitle(String title, String subtitle) {
+		SubtitleCollapsingToolbarLayout toolbarlayout = findViewById(R.id.toolbar_layout);
+		toolbarlayout.setTitle(title);
+		toolbarlayout.setSubtitle(subtitle);
 	}
 }

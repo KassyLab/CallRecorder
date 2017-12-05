@@ -109,7 +109,7 @@ public class CallListFragment extends Fragment implements
 				null,
 				null,
 				null,
-				null
+				CallRecordContract.Call.COLUMN_DATE + " DESC"
 		);
 	}
 	
