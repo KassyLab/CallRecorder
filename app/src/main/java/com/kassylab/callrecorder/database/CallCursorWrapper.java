@@ -55,6 +55,9 @@ public class CallCursorWrapper extends CursorWrapper {
 		id = getColumnIndex(CallRecordContract.Call.COLUMN_RECORD);
 		if (id != -1) values.put(CallRecordContract.Call.COLUMN_RECORD, getLong(id));
 		
+		id = getColumnIndex(CallRecordContract.Call.COLUMN_FAVORITE);
+		if (id != -1) values.put(CallRecordContract.Call.COLUMN_FAVORITE, getInt(id) == 1);
+		
 		return values;
 	}
 }

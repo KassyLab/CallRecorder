@@ -29,6 +29,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.telephony.PhoneNumberUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -363,7 +364,7 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		
 		String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
 		
-		String contactName = phoneNumber;
+		String contactName = PhoneNumberUtils.formatNumber(phoneNumber);
 		Cursor cursor = getContext().getContentResolver()
 				.query(uri, projection, null, null, null);
 		

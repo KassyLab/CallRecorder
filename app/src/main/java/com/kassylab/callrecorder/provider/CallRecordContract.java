@@ -66,6 +66,7 @@ public class CallRecordContract {
         public static final String COLUMN_TYPE = "type";
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_RECORD = "record_id";
+	    public static final String COLUMN_FAVORITE = "favorite";
     }
 
     /**
