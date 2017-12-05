@@ -66,8 +66,8 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 	 * The fragment argument representing the item URI that this fragment
 	 * represents.
 	 */
-	public static final String ARG_ITEM_URI =
-			CallDetailFragment.class.getCanonicalName() + ".args.ITEM_URI";
+	public static final String ARG_ITEM_URI
+			= CallDetailFragment.class.getCanonicalName() + ".args.ITEM_URI";
 	
 	private static final int LOADER_CALL = 1;
 	private static final int LOADER_RECORD = 2;
@@ -127,12 +127,6 @@ public class CallDetailFragment extends Fragment implements LoaderManager.Loader
 		
 		if (savedInstanceState != null && savedInstanceState.containsKey(ARG_ITEM_URI)) {
 			mItemUri = savedInstanceState.getParcelable(ARG_ITEM_URI);
-			
-			/*Activity activity = this.getActivity();
-			CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
-			if (appBarLayout != null) {
-				appBarLayout.setTitle(mItem.content);
-			}*/
 		}
 	}
 	

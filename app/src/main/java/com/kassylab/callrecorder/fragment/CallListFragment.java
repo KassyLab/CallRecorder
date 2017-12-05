@@ -46,8 +46,12 @@ import com.kassylab.callrecorder.provider.CallRecordContract;
 public class CallListFragment extends Fragment implements
 		LoaderManager.LoaderCallbacks<Cursor>, RecyclerViewCursorAdapter.OnItemInteractionListener {
 	
+	private static final String ARG_FAVORITE
+			= CallListFragment.class.getCanonicalName() + ".args.FAVORITE";
+	
 	private OnCallSelectedListener mListener;
 	private CallRecyclerViewCursorAdapter mAdapter;
+	private boolean mFavorite;
 	
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,8 +60,25 @@ public class CallListFragment extends Fragment implements
 	public CallListFragment() {
 	}
 	
-	public static CallListFragment newInstance() {
-		return new CallListFragment();
+	public static Fragment newInstance(boolean favorite) {
+		Fragment fragment = new CallListFragment();
+		Bundle args = new Bundle();
+		args.putBoolean(ARG_FAVORITE, favorite);
+		fragment.setArguments(args);
+		return fragment;
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		if (savedInstanceState == null) {
+			savedInstanceState = getArguments();
+		}
+		
+		if (savedInstanceState != null && savedInstanceState.containsKey(ARG_FAVORITE)) {
+			mFavorite = savedInstanceState.getBoolean(ARG_FAVORITE);
+		}
 	}
 	
 	@Override
@@ -107,7 +128,7 @@ public class CallListFragment extends Fragment implements
 				getContext(),
 				CallRecordContract.Call.CONTENT_URI,
 				null,
-				null,
+				(mFavorite) ? CallRecordContract.Call.COLUMN_FAVORITE + " = 1" : null,
 				null,
 				CallRecordContract.Call.COLUMN_DATE + " DESC"
 		);

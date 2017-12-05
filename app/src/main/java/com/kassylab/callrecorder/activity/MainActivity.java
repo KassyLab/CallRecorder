@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements
 			switch (position) {
 				case 0:
 				case 1:
-					return CallListFragment.newInstance();
+					return CallListFragment.newInstance(position == 1);
 				case 2:
 					return ContactsFragment.newInstance();
 			}
