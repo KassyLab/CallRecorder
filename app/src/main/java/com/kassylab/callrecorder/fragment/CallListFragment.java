@@ -20,6 +20,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -34,8 +35,10 @@ import android.view.ViewGroup;
 
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.adapter.CallRecyclerViewCursorAdapter;
-import com.kassylab.callrecorder.adapter.RecyclerViewCursorAdapter;
 import com.kassylab.callrecorder.provider.CallRecordContract;
+import com.kassylab.recyclerviewcursoradapter.RecyclerViewCursorAdapter;
+
+import java.util.stream.IntStream;
 
 /**
  * A fragment representing a list of Items.

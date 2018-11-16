@@ -36,6 +36,12 @@ allprojects {
     }
 }
 
+repositories{
+    maven {
+        url  "http://dl.bintray.com/kassylab/android"
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

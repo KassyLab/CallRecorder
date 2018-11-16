@@ -50,8 +50,21 @@ public class CallRecordProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-        // TODO: Implement this to handle requests to delete one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+    
+        switch (uriMatcher.match(uri)) {
+            case CALL_ID:
+                return database.delete(CallRecordContract.PATH_CALLS,
+                        CallRecordContract.Call._ID + EQUALS,
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
+            case CALLS:
+            case RECORDS:
+            case RECORD_ID:
+                // TODO: Implement this to handle requests to update one or more rows.
+                throw new UnsupportedOperationException("Not yet implemented");
+            default:
+                throw new IllegalArgumentException("Unknown Uri: " + uri);
+        }
     }
 
     @Override

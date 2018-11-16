@@ -109,4 +109,10 @@ public class CallDetailActivity extends AppCompatActivity implements
 		toolbarlayout.setTitle(title);
 		toolbarlayout.setSubtitle(subtitle);
 	}
+	
+	@Override
+	public void onDeleteCall(Uri itemUri) {
+		//TODO: Remove file
+		getContentResolver().delete(itemUri, null, null);
+	}
 }

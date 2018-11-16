@@ -337,6 +337,7 @@ public class CallDetailFragment extends Fragment /*implements View.OnClickListen
 	
 	public interface OnCallDetailInteractionListener {
 		void setActionBarTitle(String title, String subtitle);
+		void onDeleteCall(Uri itemUri);
 	}
 	
 	private class LoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {

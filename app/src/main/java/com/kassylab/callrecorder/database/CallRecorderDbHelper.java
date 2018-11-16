@@ -29,7 +29,7 @@ import com.kassylab.callrecorder.provider.CallRecordContract;
 public class CallRecorderDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "CallRecord.db";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 1;
 
     private static final String SQL_CREATE_RECORD_TABLE =
             "CREATE TABLE records (" +
@@ -45,7 +45,7 @@ public class CallRecorderDbHelper extends SQLiteOpenHelper {
                     CallRecordContract.Call.COLUMN_RECORD + " INTEGER, " +
 		            CallRecordContract.Call.COLUMN_FAVORITE + " INTEGER NOT NULL DEFAULT 0, " +
 		            "FOREIGN KEY(" + CallRecordContract.Call.COLUMN_RECORD + ") " +
-                    "REFERENCES record(" + CallRecordContract.Record._ID + "))";
+                    "REFERENCES record(" + CallRecordContract.Record._ID + ") ON DELETE CASCADE)";
 
     private static final String SQL_DELETE_RECORD_TABLE = "DROP TABLE IF EXISTS records";
     private static final String SQL_DELETE_CALL_TABLE = "DROP TABLE IF EXISTS calls";
@@ -62,14 +62,9 @@ public class CallRecorderDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-	    if (oldVersion == 1 && newVersion == 2) {
-		    db.execSQL("ALTER TABLE calls " +
-				    "ADD COLUMN " + CallRecordContract.Call.COLUMN_FAVORITE + " INTEGER NOT NULL DEFAULT 0");
-	    } else {
-		    db.execSQL(SQL_DELETE_CALL_TABLE);
-		    db.execSQL(SQL_DELETE_RECORD_TABLE);
+	    db.execSQL(SQL_DELETE_CALL_TABLE);
+	    db.execSQL(SQL_DELETE_RECORD_TABLE);
 		
-		    onCreate(db);
-	    }
+	    onCreate(db);
     }
 }

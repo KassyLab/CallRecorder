@@ -35,7 +35,7 @@ import android.view.ViewGroup;
 
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.adapter.ContactRecyclerViewCursorAdapter;
-import com.kassylab.callrecorder.adapter.RecyclerViewCursorAdapter;
+import com.kassylab.recyclerviewcursoradapter.RecyclerViewCursorAdapter;
 
 /**
  * A fragment representing a list of Items.

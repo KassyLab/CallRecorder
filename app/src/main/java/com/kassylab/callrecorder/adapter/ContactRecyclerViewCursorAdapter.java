@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.fragment.ContactsFragment;
+import com.kassylab.recyclerviewcursoradapter.RecyclerViewCursorAdapter;
 
 /**
  * {@link RecyclerView.Adapter} that can display an Item and makes a call to the

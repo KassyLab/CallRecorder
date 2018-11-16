@@ -33,6 +33,7 @@ import com.kassylab.callrecorder.R;
 import com.kassylab.callrecorder.database.CallCursorWrapper;
 import com.kassylab.callrecorder.database.RecordCursorWrapper;
 import com.kassylab.callrecorder.provider.CallRecordContract;
+import com.kassylab.recyclerviewcursoradapter.RecyclerViewCursorAdapter;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -43,6 +44,10 @@ import java.util.Date;
 
 public class CallRecyclerViewCursorAdapter
 		extends RecyclerViewCursorAdapter<CallRecyclerViewCursorAdapter.ViewHolder> {
+	
+	public CallRecyclerViewCursorAdapter() {
+		super();
+	}
 	
 	@Override
 	public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
